@@ -1,1 +1,1917 @@
-tes
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Aplikasi DANA Davigo - Layanan Lengkap</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script> 
+    <!-- CSS Custom kamu -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-50 relative">
+       <!-- Notification Toast -->
+    <div id="notificationToast" class="notification-toast fixed top-4 left-1/2 transform -translate-x-1/2 z-60 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl shadow-lg glass-effect">
+        <div class="flex items-center space-x-2">
+            <div class="relative">
+                <div class="w-5 h-5 bg-white/20 rounded-full pulse-ring"></div>
+                <div class="absolute inset-0 w-5 h-5 bg-white/40 rounded-full"></div>
+            </div>
+            <span class="text-sm font-medium">Menu Opened! 🎉</span>
+        </div>
+    </div>
+    
+    <!-- Menu Overlay -->
+    <div id="menuOverlay" class="menu-overlay fixed inset-0 bg-gradient-to-br from-blue-900/20 to-purple-900/20 z-40"></div>
+    
+    <!-- Slide Menu (Smaller Size) -->
+    <div id="slideMenu" class="slide-menu fixed top-0 left-0 h-full w-64 z-50 shadow-2xl border-r border-white/20">
+        <!-- Menu Header (Compact Blue Section) -->
+        <div class="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 p-4 text-white relative overflow-hidden">
+            <!-- Background Wave Effect -->
+            <div class="absolute inset-0 wave-bg opacity-30"></div>
+            
+            <div class="relative z-10">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-lg font-bold tracking-wide">✨ Menu</h2>
+                    <button id="closeMenuBtn" class="p-1.5 rounded-lg hover:bg-white/20 transition-all duration-300 glass-effect icon-bounce">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Menu Items (Scrollable White Section) -->
+        <div class="flex-1 overflow-y-auto bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl menu-scroll">
+            <div class="p-3 space-y-2">
+                
+                <!-- Settings -->
+                <button class="menu-item w-full flex items-center space-x-3 p-3 rounded-xl text-left group">
+                    <div class="w-10 h-10 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
+                        <svg class="w-5 h-5 text-gray-600 dark:text-gray-300 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-sm text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors duration-300">Settings</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">App preferences</p>
+                    </div>
+                    <svg class="w-4 h-4 text-gray-400 group-hover:text-blue-500 group-hover:translate-x-1 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </button>
+                
+                <!-- Profile -->
+                <button class="menu-item w-full flex items-center space-x-3 p-3 rounded-xl text-left group">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
+                        <svg class="w-5 h-5 text-blue-600 dark:text-blue-300 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-sm text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors duration-300">Profile</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Manage account</p>
+                    </div>
+                    <svg class="w-4 h-4 text-gray-400 group-hover:text-blue-500 group-hover:translate-x-1 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </button>
+                
+                <!-- Upgrade Premium -->
+                <button class="menu-item premium-item w-full flex items-center space-x-3 p-3 rounded-xl text-left group shadow-lg">
+                    <div class="w-10 h-10 bg-white/90 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 relative z-10">
+                        <svg class="w-5 h-5 text-orange-500 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1 relative z-10">
+                        <h4 class="font-semibold text-sm text-white group-hover:text-yellow-100 transition-colors duration-300">🚀 Upgrade Premium</h4>
+                        <p class="text-xs text-orange-100">Unlock features</p>
+                    </div>
+                    <svg class="w-4 h-4 text-white/80 group-hover:text-white group-hover:translate-x-1 transition-all duration-300 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </button>
+                
+                <!-- Rate -->
+                <button class="menu-item w-full flex items-center space-x-3 p-3 rounded-xl text-left group">
+                    <div class="w-10 h-10 bg-gradient-to-br from-emerald-100 to-emerald-200 dark:from-emerald-900 dark:to-emerald-800 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
+                        <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-300 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-sm text-gray-900 dark:text-white group-hover:text-emerald-600 transition-colors duration-300">⭐ Rate App</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Rate our app</p>
+                    </div>
+                    <svg class="w-4 h-4 text-gray-400 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </button>
+                
+                <!-- Feedback -->
+                <button class="menu-item w-full flex items-center space-x-3 p-3 rounded-xl text-left group">
+                    <div class="w-10 h-10 bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900 dark:to-purple-800 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
+                        <svg class="w-5 h-5 text-purple-600 dark:text-purple-300 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-sm text-gray-900 dark:text-white group-hover:text-purple-600 transition-colors duration-300">💬 Feedback</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Share thoughts</p>
+                    </div>
+                    <svg class="w-4 h-4 text-gray-400 group-hover:text-purple-500 group-hover:translate-x-1 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </button>
+                
+                <!-- Invite Friends -->
+                <button class="menu-item w-full flex items-center space-x-3 p-3 rounded-xl text-left group">
+                    <div class="w-10 h-10 bg-gradient-to-br from-pink-100 to-pink-200 dark:from-pink-900 dark:to-pink-800 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
+                        <svg class="w-5 h-5 text-pink-600 dark:text-pink-300 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-sm text-gray-900 dark:text-white group-hover:text-pink-600 transition-colors duration-300">👥 Invite Friends</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Earn rewards</p>
+                    </div>
+                    <svg class="w-4 h-4 text-gray-400 group-hover:text-pink-500 group-hover:translate-x-1 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </button>
+                
+                <!-- History -->
+                <button class="menu-item w-full flex items-center space-x-3 p-3 rounded-xl text-left group">
+                    <div class="w-10 h-10 bg-gradient-to-br from-indigo-100 to-indigo-200 dark:from-indigo-900 dark:to-indigo-800 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
+                        <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-300 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-sm text-gray-900 dark:text-white group-hover:text-indigo-600 transition-colors duration-300">📊 History</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Transaction history</p>
+                    </div>
+                    <svg class="w-4 h-4 text-gray-400 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </button>
+                
+                <!-- Notifications -->
+                <button class="menu-item w-full flex items-center space-x-3 p-3 rounded-xl text-left group">
+                    <div class="w-10 h-10 bg-gradient-to-br from-yellow-100 to-yellow-200 dark:from-yellow-900 dark:to-yellow-800 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
+                        <svg class="w-5 h-5 text-yellow-600 dark:text-yellow-300 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4.257 4.257l1.414 1.414M20.071 20.071l-1.414-1.414M12 6.343l-1.414-1.414M21.314 12H19M5 12H2.686M12 21.314v-2.628M12 5V2.686"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-sm text-gray-900 dark:text-white group-hover:text-yellow-600 transition-colors duration-300">🔔 Notifications</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Manage alerts</p>
+                    </div>
+                    <svg class="w-4 h-4 text-gray-400 group-hover:text-yellow-500 group-hover:translate-x-1 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </button>
+                
+                <!-- Help & Support -->
+                <button class="menu-item w-full flex items-center space-x-3 p-3 rounded-xl text-left group">
+                    <div class="w-10 h-10 bg-gradient-to-br from-teal-100 to-teal-200 dark:from-teal-900 dark:to-teal-800 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
+                        <svg class="w-5 h-5 text-teal-600 dark:text-teal-300 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-sm text-gray-900 dark:text-white group-hover:text-teal-600 transition-colors duration-300">❓ Help & Support</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Get help</p>
+                    </div>
+                    <svg class="w-4 h-4 text-gray-400 group-hover:text-teal-500 group-hover:translate-x-1 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </button>
+                
+                <!-- Sign Out -->
+                <div class="pt-3 border-t border-gray-200 dark:border-gray-700 mt-4">
+                    <button class="menu-item w-full flex items-center space-x-3 p-3 rounded-xl text-left group">
+                        <div class="w-10 h-10 bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900 dark:to-red-800 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
+                            <svg class="w-5 h-5 text-red-600 dark:text-red-300 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-sm text-gray-900 dark:text-white group-hover:text-red-600 transition-colors duration-300">🚪 Sign Out</h4>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Logout account</p>
+                        </div>
+                        <svg class="w-4 h-4 text-gray-400 group-hover:text-red-500 group-hover:translate-x-1 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div> 
+  
+    <!-- ======= HEADER SALDO (Enhanced) ======= -->
+    <header id="header-saldo" class="bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 pt-10 pb-16 relative overflow-hidden">
+        <!-- Background Wave Animation -->
+        <div class="absolute inset-0 wave-bg opacity-20"></div>
+        
+        <!-- ATAS: USER + TOMBOL REFRESH sejajar -->
+        <div class="px-4 flex justify-between items-center mb-4 relative z-10">
+            
+            <!-- Bagian kiri: Menu Titik 3 + Nama -->
+            <div class="flex items-center space-x-3">
+                <!-- Enhanced Menu Hamburger Button -->
+                <button id="menuToggleBtn" class="flex flex-col items-center text-white/90 hover:text-white group icon-bounce">
+                    <div class="relative p-3 rounded-2xl glass-effect hover:bg-white/20 transition-all duration-300 shadow-lg">
+                        <svg class="w-6 h-6 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </div>
+                </button>
+                <div>
+                    <h1 class="text-white font-bold text-xl tracking-tight">DaviCash</h1>
+                    <div class="flex items-center space-x-2 mt-1">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold glass-effect text-white shadow-lg">
+                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            Verified
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced Refresh Button -->
+            <button id="refreshSaldoBtn" class="flex flex-col items-center text-white/90 hover:text-white group smooth-transition icon-bounce">
+                <div class="relative p-3 rounded-2xl glass-effect hover:bg-white/20 transition-all duration-300 shadow-lg">
+                    <svg id="refreshIcon" class="w-6 h-6 transition-transform duration-500 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                    <div id="loadingSpinner" class="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+                <span id="refreshText" class="text-xs font-medium mt-1 group-hover:text-white transition-colors">Refresh</span>
+            </button>
+        </div>
+
+    <!-- CARD SALDO (z-20 agar di atas wave, dengan space kecil di bawah) -->
+    <div id="saldoCard" class="bg-white rounded-xl mx-4 p-4 shadow-md -mb-10 relative z-20">
+        <div class="flex justify-between items-center mb-2">
+            <div>
+                <p class="text-sm text-gray-600">Saldo Anda</p>
+                <div class="flex items-center space-x-2">
+                    <p class="font-bold text-2xl text-gray-800 balance-number">Rp<span id="balance">1.487.500</span></p>
+                    <!-- Eye icon kecil, di kanan saldo -->
+                    <button id="toggleSaldoBtn" class="p-1 rounded-full bg-gray-100 border border-gray-300 smooth-transition hover:bg-gray-200">
+                        <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="text-right">
+                <p class="text-sm text-gray-600">Poin Anda</p>
+                <p class="text-base font-bold text-gray-700"><span id="poin">0</span> Poin</p>
+            </div>
+        </div>
+
+        <!-- MENU HORIZONTAL BUTTONS - SIDE BY SIDE -->
+        <div class="flex gap-3 mt-6 border-t pt-5">
+          <!-- TopUp -->
+          <button id="topUpBtn" class="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gray-50 rounded-full text-gray-700 hover:bg-gray-100 smooth-transition">
+            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            <span class="text-sm font-medium">Isi Saldo</span>
+          </button>
+          
+          <!-- Withdraw -->
+          <button id="withdrawBtn" class="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gray-50 rounded-full text-gray-700 hover:bg-gray-100 smooth-transition">
+            <svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+            </svg>
+            <span class="text-sm font-medium">Tarik Dana</span>
+          </button>
+        </div>
+    </div>
+
+  <!-- Efek ombak di bawah header -->
+  <div class="absolute bottom-0 left-0 w-full h-20 z-0 pointer-events-none">
+    <svg class="w-full h-full" viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="waveGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#1d4ed8;stop-opacity:0.4" />
+          <stop offset="50%" style="stop-color:#3b82f6;stop-opacity:0.7" />
+          <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0.2" />
+        </linearGradient>
+      </defs>
+
+      <!-- Lapisan belakang -->
+      <path d="M0,30 C360,40 1080,20 1440,30 L1440,60 L0,60 Z"
+            fill="url(#waveGrad)" opacity="0.4">
+        <animateTransform attributeName="transform" type="translate"
+          values="0,0; 0,-3; 0,0" dur="10s" repeatCount="indefinite" />
+      </path>
+
+      <!-- Lapisan tengah -->
+      <path d="M0,35 C360,45 1080,25 1440,35 L1440,60 L0,60 Z"
+            fill="url(#waveGrad)" opacity="0.7">
+        <animateTransform attributeName="transform" type="translate"
+          values="0,0; 0,-2; 0,0" dur="10s" repeatCount="indefinite" begin="3s" />
+      </path>
+
+      <!-- Lapisan depan -->
+      <path d="M0,25 C360,35 1080,15 1440,25 L1440,60 L0,60 Z"
+            fill="url(#waveGrad)" opacity="1">
+        <animateTransform attributeName="transform" type="translate"
+          values="0,0; 0,-1; 0,0" dur="10s" repeatCount="indefinite" begin="6s" />
+      </path>
+    </svg>
+  </div>
+</header>
+
+
+<!-- ======= MAIN (UPGRADED SLIM) ======= -->
+<main id="mainScroll" class="pb-24 overflow-y-auto with-bottom-space" style="height: calc(100% - 230px)">
+
+
+    <!-- STICKY SALDO DISPLAY - Simple Version -->
+    <div id="stickySaldo" class="sticky-saldo">
+      <div class="sticky-content">
+        <div class="flex items-center space-x-3">
+          <p class="text-sm font-medium text-gray-600">Saldo:</p>
+          <p class="font-bold text-lg text-gray-800 balance-number">Rp<span id="stickyBalance">1.487.500</span></p>
+          <button id="toggleStickySaldoBtn" class="p-1 rounded-full bg-gray-100 border border-gray-300 smooth-transition hover:bg-gray-200">
+            <svg id="stickyEyeIcon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+          </button>
+        </div>
+        <div class="text-right">
+          <p class="text-sm font-medium text-gray-600"><span id="stickyPoin">0</span> Poin</p>
+        </div>
+      </div>
+    </div>
+    
+  <!-- Section: Beranda -->   
+  <section id="homeSection" class="p-5"> 
+  <!-- Card Layanan -->  
+  <div class="bg-white rounded-2xl shadow-lg p-4 relative overflow-hidden">  
+  <!-- Grid Menu (4 kolom lebih ramping) -->   
+  <div class="grid grid-cols-4 gap-3">  
+
+  <!-- Pulsa/Data (Urutan 1) -->
+  <button id="pulsaDataBtn"    
+    class="feature-card flex flex-col items-center p-3 rounded-xl bg-gradient-to-br from-gray-50 to-white     
+           hover:from-blue-50 hover:to-blue-100 shadow-md transition-all duration-300     
+           hover:shadow-lg hover:-translate-y-1 active:scale-95">  
+    <img src="https://cdn-icons-png.flaticon.com/512/1041/1041883.png"    
+      alt="Pulsa Data" class="w-8 h-8 object-contain mb-1">    
+    <span class="text-[11px] font-semibold text-gray-700 text-center">    
+      Pulsa/Data    
+    </span>    
+  </button> 
+
+  <!-- Listrik (Urutan 2) -->
+  <button id="listrikBtn"
+    class="feature-card flex flex-col items-center p-3 rounded-xl bg-gradient-to-br from-gray-50 to-white 
+           hover:from-blue-50 hover:to-blue-100 shadow-md transition-all duration-300 
+           hover:shadow-lg hover:-translate-y-1 active:scale-95">
+    <img src="https://img.icons8.com/color/48/electricity.png"
+      alt="Token Listrik" class="w-8 h-8 object-contain mb-1">
+    <span class="text-[11px] font-semibold text-gray-700 text-center">
+      Listrik
+    </span>
+  </button>
+
+  <!-- Top Up Game (Urutan 3) -->
+  <button id="topUpGameBtn"
+    class="feature-card flex flex-col items-center p-3 rounded-xl bg-gradient-to-br from-gray-50 to-white 
+           hover:from-blue-50 hover:to-blue-100 shadow-md transition-all duration-300 
+           hover:shadow-lg hover:-translate-y-1 active:scale-95">
+    <img src="https://raw.githubusercontent.com/dfandrn/Gambar/refs/heads/main/file_00000000232c622fa29bb39098993afc.png"
+      alt="Top Up Game" class="w-8 h-8 object-contain mb-1">
+    <span class="text-[11px] font-semibold text-gray-700 text-center">
+      Top Up Game
+    </span>
+  </button>
+
+  <!-- Davigo Point (Urutan 4) -->
+  <button id="davigoPointBtn"
+    class="feature-card flex flex-col items-center p-3 rounded-xl bg-gradient-to-br from-gray-50 to-white 
+           hover:from-blue-50 hover:to-blue-100 shadow-md transition-all duration-300 
+           hover:shadow-lg hover:-translate-y-1 active:scale-95">
+    <img src="https://raw.githubusercontent.com/dfandrn/Gambar/main/Picsart_25-09-07_11-41-37-689.png"
+      alt="Davigo Point" class="w-8 h-8 object-contain mb-1">
+    <span class="text-[11px] font-semibold text-gray-700 text-center">
+      Davigo Point
+    </span>
+  </button>
+
+  <!-- Promo Google Play (Urutan 5) -->
+  <button id="gplayPromoBtn"
+    class="feature-card flex flex-col items-center p-3 rounded-xl bg-gradient-to-br from-gray-50 to-white 
+           hover:from-blue-50 hover:to-blue-100 shadow-md transition-all duration-300 
+           hover:shadow-lg hover:-translate-y-1 active:scale-95">
+    <img src="https://raw.githubusercontent.com/dfandrn/Gambar/main/Picsart_25-09-06_19-38-40-018.jpg"
+      alt="Google Play" class="w-10 h-10 object-contain mb-1">
+    <span class="text-[11px] font-semibold text-gray-700 text-center">
+      Google Play
+    </span>
+  </button>
+
+  <!-- GoFood (Urutan 6) -->
+  <button id="gf-btn"
+    class="feature-card flex flex-col items-center p-3 rounded-xl bg-gradient-to-br from-gray-50 to-white 
+           hover:from-blue-50 hover:to-blue-100 shadow-md transition-all duration-300 
+           hover:shadow-lg hover:-translate-y-1 active:scale-95">
+    <img src="https://raw.githubusercontent.com/dfandrn/Gambar/main/Picsart_25-09-07_11-41-06-967.png"
+      alt="GoFood" class="w-10 h-10 object-contain mb-1">
+    <span class="text-[11px] font-semibold text-gray-700 text-center">GoFood</span>
+  </button>
+
+  <!-- E-Money (Urutan 7) -->
+  <button id="emoneyBtn"
+    class="feature-card flex flex-col items-center p-3 rounded-xl bg-gradient-to-br from-gray-50 to-white 
+           hover:from-blue-50 hover:to-blue-100 shadow-md transition-all duration-300 
+           hover:shadow-lg hover:-translate-y-1 active:scale-95">
+    <img src="https://img.icons8.com/color/48/sim-card-chip.png"
+      alt="E-Money" class="w-8 h-8 object-contain mb-1">
+    <span class="text-[11px] font-semibold text-gray-700 text-center">
+      E-Money
+    </span>
+  </button>
+
+  <!-- All Menu (Urutan 8) -->
+  <button id="trigger"
+    class="feature-card flex flex-col items-center p-3 rounded-xl bg-gradient-to-br from-gray-50 to-white 
+           hover:from-blue-50 hover:to-blue-100 shadow-md transition-all duration-300 
+           hover:shadow-lg hover:-translate-y-1 active:scale-95">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+    <span class="text-[11px] font-semibold text-gray-700 text-center">
+      All Menu
+    </span>
+  </button>
+</div>
+</div> 
+
+
+<!--  notif kecil -->
+<div class="notif-group">
+  <!-- Notifikasi kecil -->
+  <div class="notif-small" id="notifSmall">
+    <div class="left">
+      <span class="notif-text-wrapper glitch" data-text="📣 Beberapa orang 👉 🎁 DANA Deals oleh 👩‍👩‍👦">
+        📣 Beberapa orang 👉 🎁 <strong>DAVIGO Deals</strong> oleh 👩‍👩‍👦
+      </span> 
+    </div>
+    <div class="right">
+      <span class="notif-text-wrapper glitch" data-text="🔥">🔥</span>
+    </div>
+  </div>
+
+  <!-- Notifikasi besar chat 1 -->
+  <div class="notif-card" id="notifCard1">
+    <div class="notif-left">
+      <div class="notif-icon">
+        <img src="https://placehold.co/36x36/00AEEF/FFFFFF?text=%F0%9F%91%A5" alt="Teman" id="notifCard1Icon">
+      </div>
+      <div class="notif-text" id="notifCard1Text">
+        <strong>Temanmu</strong> 👉 🎁 dari 👥
+      </div>
+    </div>
+    <div class="notif-time" id="notifCard1Time">7d</div>
+  </div>
+
+  <!-- Notifikasi besar chat 2 (lebih kecil dan rapat) -->
+  <div class="notif-card" id="notifCard2">
+    <div class="notif-left">
+      <div class="notif-icon">
+        <img src="https://placehold.co/36x36/0044CC/FFFFFF?text=%F0%9F%9A%9A" alt="DANA" id="notifCard2Icon">
+      </div>
+      <div class="notif-text" id="notifCard2Text">
+        <strong>Kamu</strong> Bayar STNK praktis via e-Samsat di davicash
+      </div>
+    </div>
+    <div class="notif-time" id="notifCard2Time">9m</div>
+  </div>
+</div>
+
+
+<!-- promo slider -->
+
+
+
+<!-- DANA Protection -->
+<div class="container">
+  <!-- Protection Section -->
+  <div class="section protection-section">
+    <!-- Header biru -->
+    <div class="protection-header">
+      <div class="header-left">
+        <svg class="icon-shield" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#fff" viewBox="0 0 24 24">
+          <path d="M12 1L3 5v6c0 5 3.7 10.74 9 12 5.3-1.26 9-7 9-12V5l-9-4zM10.59 15.58l-3.17-3.17 1.41-1.41 1.76 1.76 5.76-5.76 1.41 1.41-7.17 7.17z"/>
+        </svg>
+        <span class="header-text">5 aktivitas terlindungi!</span>
+      </div>
+      <svg class="icon-arrow" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#fff" viewBox="0 0 24 24">
+        <path d="M9 18l6-6-6-6" />
+      </svg>
+    </div>
+    <!-- Garis putih kecil -->
+    <div class="header-divider"></div>
+
+    <!-- Search -->
+    <input type="search" placeholder="Ada nomor telepon mencurigakan?" class="input-search" />
+
+    <!-- Action -->
+    <div class="protection-action">
+      <div class="protection-label">
+        <svg class="icon-lock" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#007AFF" viewBox="0 0 24 24">
+          <path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-7h-1V7a5 5 0 00-10 0v3H6a2 2 0 00-2 2v6a2 2 0 002 2h12a2 2 0 002-2v-6a2 2 0 00-2-2zm-6-4a3 3 0 013 3v3H9V9a3 3 0 013-3z"/>
+        </svg>
+        <span class="protection-text">DANA PROTECTION</span>
+      </div>
+      <button class="btn-secure"><span>20%</span> AMANKAN</button>
+    </div>
+  </div>
+</div>
+
+
+
+
+  <!-- News / Latest Section -->
+  <div class="section news-section">
+    <div class="news-header">
+      <h3>Terbaru Untukmu</h3>
+      <button class="btn-see-all">LIHAT SEMUA</button>
+    </div>
+    <p class="news-subtext">Kabar terbaik minggu ini!</p>
+    <ul class="news-list">
+      <li>
+        <img src="https://i.ibb.co/0B4m2Lh/lock-icon.png" alt="lock icon" class="news-icon" />
+        <div>
+          <strong>Jaminan Anti Pending</strong><br/>
+          <small>#AmanDariBadman</small>
+        </div>
+      </li>
+      <li>
+        <img src="https://i.ibb.co/qs0T6W0/truck-icon.png" alt="truck icon" class="news-icon" />
+        <div>
+          <strong>Posko Bantuan Keliling</strong><br/>
+          <small>Nikmatin layanan prioritas buatmu</small>
+        </div>
+      </li>
+      <li>
+        <img src="https://i.ibb.co/SXZjQfs/warning-icon.png" alt="warning icon" class="news-icon" />
+        <div>
+          <strong>STOP JUDI ONLINE</strong><br/>
+          <small>Untung Sesaat, Sesat Kemudian</small>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+
+<!-- ====== Section Promo Kecil Full White ====== -->
+<div class="bg-white text-gray-900 rounded-lg shadow w-full max-w-sm mx-auto overflow-hidden mt-6">
+  <!-- Bagian Atas: Judul + Tombol -->
+  <div class="p-3 flex items-center justify-between">
+    <h2 class="text-sm font-semibold truncate pr-2">
+      Klaim 150rb kamu sekarang!
+    </h2>
+    <a 
+      id="promoBtn"
+      href="#"
+      class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 whitespace-nowrap">
+      Mulai <span>→</span>
+    </a>
+  </div>
+
+  <!-- Deskripsi -->
+  <div class="px-3 pb-2 text-center">
+    <p class="text-xs text-gray-600 leading-snug">
+      Ada hadiah Davigo Saldo s.d. <span class="font-bold text-gray-900">150.000</span> buat kamu.  
+      Buruan dapetin sebelum kehabisan!
+    </p>
+    <p class="mt-1 text-xs font-semibold text-green-600">
+      Ayo dapetin sekarang!
+    </p>
+  </div>
+  <img src="https://github.com/dfandrn/aplikasitab/blob/main/file_000000005c1861f5b144d2b6ce52d86e.png?raw=true" 
+    alt="Promo 150rb" 
+    class="w-full object-cover"
+  />
+</div>
+
+
+<!-- Toggle tema -->
+<div class="theme-toggle-container mt-4">
+  <p class="theme-title">Kamu tim mana?</p>
+  <p class="theme-sub">Sisi gelap atau terang, ayo pilih di sini! 🌟</p>
+  
+  <label class="switch">
+    <input type="checkbox" id="toggleThemeBtn" />
+    <span class="slider round">
+      <span class="icon sun">☀️</span>
+      <span class="icon moon">🌙</span>
+    </span>
+  </label>
+</div>
+
+
+<!-- Footer -->
+  <p class="footer-text">
+    DAVIGO Indonesia terdaftar serta diawasi oleh <br/>
+    <strong>Bank Sendiri </strong> dan <strong>Cipta </strong>
+  </p>
+</div>
+</section>
+
+
+<!-- Section lain jangan nyambung -->
+<section id="activitySection" class="p-5 hidden">
+  <h2 class="text-lg font-semibold mb-3">Aktivitas</h2>
+  <div id="txnList" class="bg-white rounded-xl p-3">
+    <div class="empty-state" id="emptyTxn">Belum ada transaksi.</div>
+  </div>
+        <!-- syarat berfungsi riwayat trx -->
+      <div id="txnSummary" class="hidden p-4 font-semibold text-gray-800 text-lg"></div>
+<div id="txnList" class="hidden"></div>
+<div id="emptyTxn" class="hidden text-center text-gray-500 p-4">Belum ada transaksi</div>
+</section>
+
+<!-- ===== Pay/Minta/Kirim Bottom Sheet ala DANA ===== -->
+<div id="paySection" class="hidden fixed inset-0 z-30 flex flex-col justify-end">
+  <!-- backdrop -->
+  <div id="payBackdrop" class="absolute inset-0 bg-black bg-opacity-40"></div>
+  
+  <!-- card -->
+  <div id="payCard"
+       class="relative w-full bg-white rounded-t-2xl shadow-lg transform translate-y-full transition-transform duration-300">
+    
+    <!-- grip bar -->
+    <div class="flex justify-center mt-2">
+      <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
+    </div>
+
+    <!-- tab menu -->
+    <div class="flex justify-around mt-3 border-b">
+      <button class="tabBtn py-2 px-4 font-semibold text-blue-600 border-b-2 border-blue-600" data-tab="0">PAY</button>
+      <button class="tabBtn py-2 px-4 text-gray-500" data-tab="1">MINTA</button>
+      <button class="tabBtn py-2 px-4 text-gray-500" data-tab="2">KIRIM</button>
+    </div>
+
+<!-- slider content -->
+<div id="tabSlider" class="flex transition-transform duration-300 w-full">
+  <!-- PAY -->
+  <div class="w-full flex-shrink-0 p-4 flex justify-center">
+    <div class="w-[85%] h-[60vh] bg-black rounded-xl overflow-hidden shadow-lg">
+      <iframe src="https://dfandrn.github.io/Qris-new-broh/" class="w-full h-full border-0"></iframe>
+    </div>
+  </div>
+  <!-- MINTA -->
+  <div class="w-full flex-shrink-0 p-4 flex items-center justify-center">
+    <p class="text-gray-600">Form Minta Uang (Coming Soon)</p>
+  </div>
+  <!-- KIRIM -->
+  <div class="w-full flex-shrink-0 p-4 flex items-center justify-center">
+    <p class="text-gray-600">Form Kirim Uang (Coming Soon)</p>
+  </div>
+</div>
+
+    <!-- tombol tutup -->
+    <div class="py-4 text-center">
+      <button id="closePay" class="text-blue-600 font-semibold">TUTUP</button>
+    </div>
+  </div>
+</div>
+
+<section id="walletSection" class="p-5 hidden">
+  <!-- Main Loan Card -->
+  <div class="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-6 shadow-2xl relative overflow-hidden mb-6">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 opacity-20">
+      <div class="absolute top-0 right-0 w-32 h-32 bg-white rounded-full -translate-y-16 translate-x-16"></div>
+      <div class="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full translate-y-12 -translate-x-12"></div>
+    </div>
+    
+    <!-- Card Content -->
+    <div class="relative z-10">
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center space-x-3">
+          <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-white font-bold text-xl">DaviCash Pinjaman</h3>
+            <p class="text-white/70 text-sm">Layanan Pinjaman Digital</p>
+          </div>
+        </div>
+        <div class="text-right">
+          <p class="text-white/70 text-xs">Total Pinjaman</p>
+          <p class="text-white font-bold text-2xl">Rp 0</p>
+        </div>
+      </div>
+      
+      <!-- Loan Status Display -->
+      <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-white/80 text-sm">Limit Pinjaman</span>
+          <span class="text-white font-semibold">Rp 50.000.000</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-white/80 text-sm">Tersedia</span>
+          <span class="text-white font-semibold">Rp 50.000.000</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wallet Details Cards -->
+  <div class="space-y-4">
+    <!-- Bank Account Card -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+      <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+            </svg>
+          </div>
+          <div>
+            <h4 class="text-white font-semibold">Bank Tertaut</h4>
+            <p class="text-white/70 text-sm">Rekening bank utama</p>
+          </div>
+        </div>
+      </div>
+      <div class="p-4">
+        <div class="flex items-center justify-between">
+          <span class="text-gray-600 dark:text-gray-400">Status</span>
+          <span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full text-sm">Belum terhubung</span>
+        </div>
+        <button class="w-full mt-3 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition-colors duration-200">
+          + Tambah Bank
+        </button>
+      </div>
+    </div>
+
+    <!-- Credit Card -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+      <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 p-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+            </svg>
+          </div>
+          <div>
+            <h4 class="text-white font-semibold">Kartu Kredit/Debit</h4>
+            <p class="text-white/70 text-sm">Kartu pembayaran</p>
+          </div>
+        </div>
+      </div>
+      <div class="p-4">
+        <div class="flex items-center justify-between">
+          <span class="text-gray-600 dark:text-gray-400">Kartu Tersimpan</span>
+          <span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full text-sm">0 Kartu</span>
+        </div>
+        <button class="w-full mt-3 bg-emerald-500 hover:bg-emerald-600 text-white py-2 px-4 rounded-lg transition-colors duration-200">
+          + Tambah Kartu
+        </button>
+      </div>
+    </div>
+
+    <!-- Daily Limit -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+      <div class="bg-gradient-to-r from-amber-500 to-orange-500 p-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+            </svg>
+          </div>
+          <div>
+            <h4 class="text-white font-semibold">Limit Harian</h4>
+            <p class="text-white/70 text-sm">Batas transaksi per hari</p>
+          </div>
+        </div>
+      </div>
+      <div class="p-4">
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-gray-600 dark:text-gray-400">Limit Maksimal</span>
+            <span class="font-semibold text-gray-900 dark:text-gray-100">Rp 5.000.000.000</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-gray-600 dark:text-gray-400">Terpakai Hari Ini</span>
+            <span class="font-semibold text-gray-900 dark:text-gray-100">Rp 0</span>
+          </div>
+          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            <div class="bg-gradient-to-r from-amber-500 to-orange-500 h-2 rounded-full" style="width: 0%"></div>
+          </div>
+          <p class="text-xs text-gray-500 dark:text-gray-400 text-center">Sisa limit: Rp 5.000.000.000</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <!-- ======= Bottom Navigation (tambahan) ======= -->
+  <nav class="bottom-nav">
+    <div class="row">
+      <button id="tabHome" class="active">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9.75L12 3l9 6.75V21a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1V9.75z"/>
+        </svg><span>Beranda</span>
+      </button>
+      <button id="tabAktivitas">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6a2 2 0 00-2-2H5m6 8V9a2 2 0 012-2h2m-6 10h6"/>
+        </svg><span>Aktivitas</span>
+      </button>
+    <!-- Pay/QRIS -->
+    <button id="tabPay">
+      <img src="https://raw.githubusercontent.com/dfandrn/img/main/qr-code-scanning-payment-qr-code-3d-icon-png.png" 
+    </button>
+      <button id="tabWallet">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2m0 0h4V9h-4v6z"/>
+        </svg><span>Dompet</span>
+      </button>
+      <button id="tabLogout" class="flex flex-col items-center text-gray-500">
+  <svg xmlns="http://www.w3.org/2000/svg" 
+       class="h-5 w-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 11-4 0v-1m0-10V5a2 2 0 114 0v1"/>
+  </svg>
+  <span>Profil</span>
+</button>
+    </div>
+  </nav>
+
+<!-- Loading Skeleton -->
+<div id="gf-loading" class="fixed inset-0 bg-white z-[9999] hidden overflow-y-auto">
+  <div class="max-w-md mx-auto p-4 space-y-4 animate-pulse">
+    
+    <!-- ðŸ”´ Header -->
+    <h1 class="text-2xl font-bold text-red-600">GoFood</h1>
+    
+    <!-- ðŸ” Search Bar Skeleton -->
+    <div class="bg-gray-200 rounded-full h-10 shadow-inner"></div>
+    
+    <!-- ðŸŽžï¸ Promo Slider Skeleton -->
+    <div class="flex space-x-3 overflow-x-auto no-scrollbar">
+      <div class="skeleton-item bg-gray-200 rounded-lg shadow-xl w-40 h-24"></div>
+      <div class="skeleton-item bg-gray-200 rounded-lg shadow-xl w-40 h-24"></div>
+      <div class="skeleton-item bg-gray-200 rounded-lg shadow-xl w-40 h-24"></div>
+    </div>
+    
+    <!-- ðŸ½ï¸ Menu List Skeleton -->
+    <div class="grid grid-cols-2 gap-4">
+      <div class="skeleton-item bg-white rounded-lg shadow-xl p-2 flex flex-col">
+        <div class="bg-gray-200 rounded w-full h-32"></div>
+        <div class="mt-2 h-3 bg-gray-200 rounded w-3/4"></div>
+        <div class="mt-1 h-3 bg-gray-200 rounded w-1/2"></div>
+        <div class="mt-auto flex justify-between items-center pt-2">
+          <div class="h-3 bg-gray-200 rounded w-12"></div>
+          <div class="h-6 w-6 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+      
+      <div class="skeleton-item bg-white rounded-lg shadow-xl p-2 flex flex-col">
+        <div class="bg-gray-200 rounded w-full h-32"></div>
+        <div class="mt-2 h-3 bg-gray-200 rounded w-3/4"></div>
+        <div class="mt-1 h-3 bg-gray-200 rounded w-1/2"></div>
+        <div class="mt-auto flex justify-between items-center pt-2">
+          <div class="h-3 bg-gray-200 rounded w-12"></div>
+          <div class="h-6 w-6 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+      
+      <div class="skeleton-item bg-white rounded-lg shadow-xl p-2 flex flex-col">
+        <div class="bg-gray-200 rounded w-full h-32"></div>
+        <div class="mt-2 h-3 bg-gray-200 rounded w-3/4"></div>
+        <div class="mt-1 h-3 bg-gray-200 rounded w-1/2"></div>
+        <div class="mt-auto flex justify-between items-center pt-2">
+          <div class="h-3 bg-gray-200 rounded w-12"></div>
+          <div class="h-6 w-6 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+      
+      <div class="skeleton-item bg-white rounded-lg shadow-xl p-2 flex flex-col">
+        <div class="bg-gray-200 rounded w-full h-32"></div>
+        <div class="mt-2 h-3 bg-gray-200 rounded w-3/4"></div>
+        <div class="mt-1 h-3 bg-gray-200 rounded w-1/2"></div>
+        <div class="mt-auto flex justify-between items-center pt-2">
+          <div class="h-3 bg-gray-200 rounded w-12"></div>
+          <div class="h-6 w-6 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+
+      <div class="skeleton-item bg-white rounded-lg shadow-xl p-2 flex flex-col">
+        <div class="bg-gray-200 rounded w-full h-32"></div>
+        <div class="mt-2 h-3 bg-gray-200 rounded w-3/4"></div>
+        <div class="mt-1 h-3 bg-gray-200 rounded w-1/2"></div>
+        <div class="mt-auto flex justify-between items-center pt-2">
+          <div class="h-3 bg-gray-200 rounded w-12"></div>
+          <div class="h-6 w-6 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+
+      <div class="skeleton-item bg-white rounded-lg shadow-xl p-2 flex flex-col">
+        <div class="bg-gray-200 rounded w-full h-32"></div>
+        <div class="mt-2 h-3 bg-gray-200 rounded w-3/4"></div>
+        <div class="mt-1 h-3 bg-gray-200 rounded w-1/2"></div>
+        <div class="mt-auto flex justify-between items-center pt-2">
+          <div class="h-3 bg-gray-200 rounded w-12"></div>
+          <div class="h-6 w-6 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FULLSCREEN LAYOUT -->
+<div id="gf-layout" class="fixed inset-0 bg-gray-50 z-[9998] hidden overflow-auto">
+
+<!-- Garis merah + Header dengan efek glow -->
+<div class="bg-red-600 pt-4 relative">
+  <!-- Efek glow halus dari atas -->
+  <div class="absolute top-0 left-0 w-full h-6 bg-gradient-to-b from-white/50 to-transparent blur-md"></div>
+  
+  <!-- Header -->
+  <div class="bg-white relative z-10 p-4 flex justify-between items-center shadow-md rounded-t-2xl">
+    <div class="flex items-center space-x-2">
+      <h2 class="text-2xl font-extrabold text-red-600">GoFood</h2>
+      <span class="bg-red-600 text-white text-xs font-semibold px-2 py-1 rounded-full">Murahh</span>
+    </div>
+    <div class="flex items-center space-x-3">
+      <button id="aktivitas-btn" class="text-sm bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700">Aktivitas</button>
+      <button id="gf-close" class="text-gray-900 text-lg font-bold hover:scale-110 transition">&times;</button>
+    </div>
+  </div>
+</div>
+
+  <!-- Banner + Carousel Promo -->
+  <div class="px-4 pt-3 relative mt-3">
+    <div class="relative overflow-hidden rounded-xl shadow-md">
+      <div id="promo-carousel" class="flex transition-transform duration-500">
+        <img src="https://raw.githubusercontent.com/dfandrn/img/main/promo_makan_murah.jpg" />
+        <img src="https://raw.githubusercontent.com/dfandrn/img/main/Acquisition_Surga_Makanan_Blog_1456x818_copy_9a90f08e43.jpg" />
+        <img src="https://raw.githubusercontent.com/dfandrn/img/main/Promo_Maksimal_FS_Mealtimes_Jan_Blog_1456x818_dc9b04c3d4.jpg" />
+      </div>
+    </div>
+    <!-- Carousel dots -->
+    <div id="carousel-indicators" class="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20"></div>
+  </div>
+
+  <!-- Search dengan efek -->
+  <div class="px-4 mt-5">
+    <div id="search-wrapper" 
+         class="flex items-center bg-white rounded-full px-3 py-1.5 mb-2 
+                shadow-md border border-transparent
+                transition-all duration-300"> 
+      <span class="text-gray-400 mr-2">ðŸ”</span>
+      <input id="search-menu" 
+             type="text" 
+             placeholder="cari makanan favoritmu..."
+             class="flex-1 outline-none text-base text-gray-700 placeholder-gray-400" />
+    </div>
+  </div>
+
+  <!-- Teks Hemat -->
+  <div class="px-4 mt-3">
+    <p class="font-bold text-red-600 text-base md:text-lg">Hemat dan Murah</p>
+  </div>
+
+  <!-- Filter Promo + Kategori -->
+  <div class="px-4 mt-2 border-b border-gray-200 pb-2 relative">
+    <div class="flex items-center space-x-3 mb-2">
+      <button id="promo-btn" class="bg-red-600 text-white text-xs px-3 py-1 rounded-full hover:bg-red-700 transition">
+        Promo Spesial 
+      </button>
+    </div>
+    <div id="category-bar" class="flex space-x-4 overflow-x-auto no-scrollbar"></div>
+  </div>
+
+  <!-- Menu List dengan card lebih panjang -->
+  <div id="menu-list" class="w-full max-w-md mx-auto grid grid-cols-2 gap-4 p-4"></div>
+
+  <!-- Riwayat & Bayar -->
+  <div id="cart-layout" class="p-4 border-t mt-2 bg-gray-50 hidden">
+    <h3 class="font-bold text-red-600 mb-2">Riwayat Pesanan</h3>
+    <ul id="cart-list" class="text-sm mb-2 text-gray-900"></ul>
+    <div class="flex justify-between font-bold text-red-600 mb-2">
+      <span>Total</span>
+      <span id="cart-total">Rp0</span>
+    </div>
+    <button id="pay-btn" class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">Bayar</button>
+  </div>
+</div>
+
+<!-- Layout Aktivitas -->
+<div id="aktivitas-layout" class="fixed inset-0 bg-gray-100 z-[9999] hidden overflow-y-auto">  
+  <div class="bg-white p-4 flex justify-between items-center shadow">  
+    <h2 class="text-xl font-bold text-red-600">Aktivitas</h2>  
+    <button id="aktivitas-close" class="text-gray-900 text-lg font-bold hover:scale-110">&times;</button>  
+  </div>  
+  <div id="tx-list" class="p-4 space-y-3"></div>  
+</div>
+
+<!-- Overlay Detail Transaksi -->
+<div id="tx-detail-layout" class="fixed inset-0 bg-gray-100 z-[10000] hidden overflow-y-auto">
+  <div class="bg-white p-4 flex justify-between items-center shadow">
+    <h2 class="text-xl font-bold text-red-600">Detail Transaksi</h2>
+    <button id="tx-detail-close" class="text-gray-900 text-lg font-bold hover:scale-110">&times;</button>
+  </div>
+  <div id="tx-detail-list" class="p-4 space-y-3"></div>
+</div>
+
+
+<!-- ======= MODAL VERIFIKASI AWAL (LOGIN) - PROFESSIONAL E-WALLET STYLE ======= -->
+<div id="startupVerify" class="fixed inset-0 bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 flex items-center justify-center p-4 z-50">
+  <!-- Background Effects -->
+  <div class="absolute inset-0 overflow-hidden">
+    <div class="absolute top-1/4 left-1/4 w-32 h-32 bg-blue-500/20 rounded-full blur-xl animate-pulse"></div>
+    <div class="absolute top-3/4 right-1/4 w-24 h-24 bg-purple-500/20 rounded-full blur-xl animate-pulse" style="animation-delay: 1s;"></div>
+    <div class="absolute bottom-1/4 left-3/4 w-40 h-40 bg-pink-500/20 rounded-full blur-xl animate-pulse" style="animation-delay: 2s;"></div>
+  </div>
+  
+  <!-- Main Container -->
+  <div class="relative w-full max-w-md">
+    <!-- Progress Indicator -->
+    <div class="mb-8">
+      <div class="flex justify-center space-x-3 mb-4">
+        <div id="progressStep1" class="step-indicator active">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path>
+          </svg>
+        </div>
+        <div id="progressStep2" class="step-indicator">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 2 2 0 012 2 1 1 0 102 0 4 4 0 00-4-4z" clip-rule="evenodd"></path>
+          </svg>
+        </div>
+        <div id="progressStep3" class="step-indicator">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path>
+          </svg>
+        </div>
+        <div id="progressStep4" class="step-indicator">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 2L3 9l7 7 7-7-7-7z"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="bg-gray-200/20 rounded-full h-1 backdrop-blur-sm">
+        <div id="progressBar" class="bg-gradient-to-r from-blue-400 to-purple-500 h-1 rounded-full transition-all duration-500 ease-out" style="width: 25%"></div>
+      </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
+      <!-- Glowing Header -->
+      <div class="relative bg-gradient-to-r from-blue-600/20 to-purple-600/20 p-6 text-center border-b border-white/10">
+        <div class="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 animate-pulse"></div>
+        <div class="relative">
+          <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-xl shadow-blue-500/25">
+            <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+            </svg>
+          </div>
+          <h2 class="text-2xl font-bold text-white mb-2">Verifikasi Akun</h2>
+          <p class="text-blue-100 text-sm">Masuk untuk melanjutkan ke beranda</p>
+        </div>
+      </div>
+
+      <!-- Content Area -->
+      <div class="p-6">
+        <!-- Step 1: Nomor HP -->
+        <div id="verifyStepPhone" class="step-content">
+          <div class="text-center mb-6">
+            <div class="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-green-400 to-blue-500 rounded-xl flex items-center justify-center">
+              <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-white mb-2">Verifikasi Nomor HP</h3>
+            <p class="text-gray-300 text-sm">Masukkan nomor HP yang terdaftar</p>
+          </div>
+
+          <div class="space-y-4">
+            <div class="relative">
+              <label class="block text-sm font-medium text-gray-300 mb-2">Nomor HP</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <span class="text-gray-400 text-sm">+62</span>
+                </div>
+                <input 
+                  type="tel" 
+                  id="startupPhone" 
+                  placeholder="8xxxxxxxxxx" 
+                  inputmode="numeric"
+                  class="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 focus:outline-none transition-all duration-300 backdrop-blur-sm text-base"
+                />
+                <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-400/0 to-purple-400/0 opacity-0 transition-opacity duration-300 pointer-events-none input-glow"></div>
+              </div>
+            </div>
+
+            <button onclick="startupSendOTP()" class="w-full btn-gradient-primary">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+              </svg>
+              Kirim OTP
+            </button>
+
+            <button id="havePinBtn" class="w-full btn-gradient-secondary">
+              <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path>
+              </svg>
+              Sudah punya PIN
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2: OTP -->
+        <div id="verifyStepOTP" class="step-content hidden">
+          <div class="text-center mb-6">
+            <div class="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center">
+              <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 2 2 0 012 2 1 1 0 102 0 4 4 0 00-4-4z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-white mb-2">Masukkan Kode OTP</h3>
+            <p class="text-gray-300 text-sm">Kode OTP telah dikirim ke nomor HP Anda</p>
+          </div>
+
+          <div class="space-y-4">
+            <div class="relative">
+              <label class="block text-sm font-medium text-gray-300 mb-2">Kode OTP</label>
+              <input 
+                type="text" 
+                id="startupOTP" 
+                placeholder="• • • • • •" 
+                inputmode="numeric" 
+                maxlength="6"
+                class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20 focus:outline-none transition-all duration-300 backdrop-blur-sm text-center text-lg tracking-widest font-mono text-base"
+              />
+            </div>
+
+            <button onclick="startupVerifyOTP()" class="w-full btn-gradient-primary">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Verifikasi OTP
+            </button>
+
+            <button onclick="startupResendOTP()" class="w-full btn-text">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+              Kirim Ulang OTP
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 3: Set PIN baru -->
+        <div id="verifyStepSetPIN" class="step-content hidden">
+          <div class="text-center mb-6">
+            <div class="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center">
+              <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-white mb-2">Buat PIN Keamanan</h3>
+            <p class="text-gray-300 text-sm">Buat PIN 6 digit untuk keamanan akun Anda</p>
+          </div>
+
+          <div class="space-y-4">
+            <div class="relative">
+              <label class="block text-sm font-medium text-gray-300 mb-2">PIN Baru</label>
+              <input 
+                type="password" 
+                id="startupSetPIN1" 
+                placeholder="• • • • • •" 
+                maxlength="6" 
+                inputmode="numeric"
+                class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 focus:outline-none transition-all duration-300 backdrop-blur-sm text-center text-lg tracking-widest font-mono text-base"
+              />
+            </div>
+
+            <div class="relative">
+              <label class="block text-sm font-medium text-gray-300 mb-2">Konfirmasi PIN</label>
+              <input 
+                type="password" 
+                id="startupSetPIN2" 
+                placeholder="• • • • • •" 
+                maxlength="6" 
+                inputmode="numeric"
+                class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 focus:outline-none transition-all duration-300 backdrop-blur-sm text-center text-lg tracking-widest font-mono text-base"
+              />
+            </div>
+
+            <button onclick="startupSavePIN()" class="w-full btn-gradient-primary">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+              </svg>
+              Simpan PIN
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 4: Masukkan PIN -->
+        <div id="verifyStepPIN" class="step-content hidden">
+          <div class="text-center mb-6">
+            <div class="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-xl flex items-center justify-center">
+              <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 2L3 9l7 7 7-7-7-7z"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-white mb-2">Masukkan PIN</h3>
+            <p class="text-gray-300 text-sm">Gunakan PIN keamanan untuk masuk</p>
+          </div>
+
+          <div class="space-y-4">
+            <div class="relative">
+              <label class="block text-sm font-medium text-gray-300 mb-2">PIN Keamanan</label>
+              <input 
+                type="password" 
+                id="startupPIN" 
+                placeholder="• • • • • •" 
+                maxlength="6" 
+                inputmode="numeric"
+                class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 focus:outline-none transition-all duration-300 backdrop-blur-sm text-center text-lg tracking-widest font-mono text-base"
+              />
+            </div>
+
+            <button onclick="startupVerifyPIN()" class="w-full btn-gradient-primary">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+              </svg>
+              Masuk
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trust Indicators -->
+    <div class="mt-6 text-center">
+      <div class="flex items-center justify-center space-x-4 text-white/60 text-xs">
+        <div class="flex items-center">
+          <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path>
+          </svg>
+          <span>Aman & Terenkripsi</span>
+        </div>
+        <div class="flex items-center">
+          <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+          </svg>
+          <span>Terpercaya</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ======= SHEET PULSA/DATA Dana-style ======= -->
+<div id="pulsaSheet" class="sheet">
+  
+  <!-- Wrapper garis biru + glow -->
+  <div class="relative bg-blue-600 pt-4 rounded-t-2xl overflow-hidden">
+    
+    <!-- Efek cahaya glow dari atas -->
+    <div class="pointer-events-none absolute inset-0 z-0">
+      <div class="w-full h-8 bg-gradient-to-b from-blue-200/70 to-transparent blur-md"></div>
+    </div>
+    
+    <!-- Header -->
+    <div class="relative z-10 bg-white text-blue-600 flex justify-between items-center px-4 py-3 shadow-md rounded-t-2xl">
+      <span class="font-semibold text-lg">Pulsa & Paket Data</span>
+      <button class="closeSheetBtn text-blue-600 text-2xl leading-none hover:scale-110 transition">&times;</button>
+    </div>
+  </div>
+  <!-- Body -->
+  <div class="body bg-white p-4">
+    <!-- Nomor HP -->
+    <div class="bg-white rounded-xl p-4 shadow-sm border mb-4">
+      <label class="text-xs text-gray-500 font-medium">Nomor HP</label>
+      <input id="pulsaPhone" type="tel" placeholder="08xxxxxxxxxx"
+             class="w-full border border-gray-200 rounded-lg px-3 py-2 mt-2 focus:outline-none focus:ring-2 focus:ring-blue-400" 
+             inputmode="numeric">
+    </div>
+
+    <!-- Pilih Nominal -->
+    <div class="mb-4">
+      <div class="flex justify-between items-center mb-2">
+        <h4 class="font-semibold text-gray-700">Pilih Nominal</h4>
+        <button id="pulsaReset" class="text-xs underline text-gray-500 hover:text-gray-700">Reset</button>
+      </div>
+      <div id="pulsaGrid" class="grid grid-cols-3 gap-3">
+        <!-- JS inject card -->
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div id="pulsaSummary" class="bg-gradient-to-b from-blue-50 to-white border border-blue-100 rounded-2xl p-4 hidden shadow-sm">
+      <div class="flex justify-between text-sm mb-1">
+        <span class="text-gray-600">Harga</span><span id="pulsaHarga" class="font-semibold text-gray-800">Rp0</span>
+      </div>
+      <div class="flex justify-between text-sm mb-1">
+        <span class="text-gray-600">Diskon</span><span id="pulsaDiskon" class="font-semibold text-red-500">- Rp0</span>
+      </div>
+      <div class="flex justify-between text-sm font-semibold text-gray-900 mb-3">
+        <span>Total Bayar</span><span id="pulsaTotal">Rp0</span>
+      </div>
+      <button id="pulsaBayar" class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 font-semibold shadow-md hover:shadow-lg transition-all">
+        Bayar Sekarang
+      </button>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ======= SHEET LISTRIK (mirip Pulsa) ======= -->
+<div id="listrikSheet" class="sheet">
+
+  <!-- Wrapper garis biru + glow -->
+  <div class="relative bg-blue-600 pt-4 rounded-t-2xl overflow-hidden">
+
+    <!-- Efek cahaya glow dari atas -->
+    <div class="pointer-events-none absolute inset-0 z-0">
+      <div class="w-full h-8 bg-gradient-to-b from-blue-200/70 to-transparent blur-md"></div>
+    </div>
+
+    <!-- Header -->
+    <div class="relative z-10 bg-white text-blue-600 flex justify-between items-center px-4 py-3 shadow-md rounded-t-2xl">
+      <span class="font-semibold text-lg">Listrik Prabayar</span>
+      <button class="closeSheetBtn text-blue-600 text-2xl leading-none hover:scale-110 transition">&times;</button>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="body bg-white p-4">
+    <!-- ID Pelanggan -->
+    <div class="bg-white rounded-xl p-4 shadow-sm border mb-4">
+      <label class="text-xs text-gray-500 font-medium">No. Meter / ID Pelanggan</label>
+      <input id="plnId" type="text" placeholder="11/12 digit" 
+             class="w-full border border-gray-200 rounded-lg px-3 py-2 mt-2 focus:outline-none focus:ring-2 focus:ring-blue-400" 
+             inputmode="numeric">
+      <div id="plnInfo" class="text-xs text-gray-500 mt-2 hidden">
+        Nama: <span id="plnNama">-</span> • Daya: <span id="plnDaya">-</span>
+      </div>
+    </div>
+
+    <!-- Pilih Nominal Token -->
+    <div class="mb-4">
+      <div class="flex justify-between items-center mb-2">
+        <h4 class="font-semibold text-gray-700">Pilih Nominal Token</h4>
+        <button id="plnReset" class="text-xs underline text-gray-500 hover:text-gray-700">Reset</button>
+      </div>
+      <div id="plnGrid" class="grid grid-cols-3 gap-3">
+        <!-- JS inject card -->
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div id="plnSummary" class="bg-gradient-to-b from-blue-50 to-white border border-blue-100 rounded-2xl p-4 hidden shadow-sm">
+      <div class="flex justify-between text-sm mb-1">
+        <span class="text-gray-600">Harga</span><span id="plnHarga" class="font-semibold text-gray-800">Rp0</span>
+      </div>
+      <div class="flex justify-between text-sm mb-1">
+        <span class="text-gray-600">Biaya Admin</span><span id="plnAdmin" class="font-semibold text-gray-800">Rp0</span>
+      </div>
+      <div class="flex justify-between text-sm mb-1">
+        <span class="text-gray-600">Diskon</span><span id="plnDiskon" class="font-semibold text-red-500">- Rp0</span>        
+      </div>
+      <div class="flex justify-between text-sm font-semibold text-gray-900 mb-3">
+        <span>Total Bayar</span><span id="plnTotal">Rp0</span>
+      </div>
+      <button id="plnBayar" 
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 font-semibold shadow-md hover:shadow-lg transition-all">
+        Bayar Sekarang
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ======= SHEET GAME (mirip Pulsa) ======= -->
+<div id="topUpGameSheet" class="sheet">
+
+  <!-- Wrapper garis biru + efek glow -->
+  <div class="relative bg-blue-600 pt-4 rounded-t-2xl overflow-hidden">
+
+    <!-- Efek cahaya glow dari atas -->
+    <div class="pointer-events-none absolute inset-0 z-0">
+      <div class="w-full h-8 bg-gradient-to-b from-blue-200/70 to-transparent blur-md"></div>
+    </div>
+
+    <!-- Header -->
+    <div class="relative z-10 bg-white text-blue-600 flex justify-between items-center px-4 py-3 shadow-md rounded-t-2xl">
+      <span class="font-semibold text-lg">Top Up Game</span>
+      <button class="closeSheetBtn text-blue-600 text-2xl leading-none hover:scale-110 transition">&times;</button>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="body bg-white p-4">
+    <!-- Logo game yang dipilih -->
+    <div id="selectedGame" class="flex justify-center mb-3 hidden">
+      <img id="gameLogo" src="" alt="Game Logo" class="w-16 h-16">
+    </div>
+
+    <!-- Pilih game -->
+    <h4 class="font-semibold mb-2 text-gray-700">🔥 Game Populer 🔥</h4>
+    <div id="gameList" class="grid grid-cols-2 gap-3 mb-3">
+      <!-- JS inject game cards -->
+    </div>
+
+    <!-- Input ID player -->
+    <div class="bg-white rounded-xl p-4 shadow-sm border mb-4">
+      <label class="text-xs text-gray-500 font-medium">Player ID</label>
+      <input id="gameUserId" type="text" placeholder="Masukkan ID Player" 
+             class="w-full border border-gray-200 rounded-lg px-3 py-2 mt-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+    </div>
+
+    <!-- Pilih nominal -->
+    <div class="mb-4">
+      <div class="flex justify-between items-center mb-2">
+        <h4 class="font-semibold text-gray-700">Pilih Nominal</h4>
+        <button id="gameReset" class="text-xs underline text-gray-500 hover:text-gray-700">Reset</button>
+      </div>
+      <div id="gameGrid" class="grid grid-cols-2 gap-3">
+        <!-- JS inject nominal cards -->
+      </div>
+    </div>
+
+    <!-- Ringkasan pembayaran -->
+    <div id="gameSummary" class="bg-gradient-to-b from-purple-50 to-white border border-purple-100 rounded-2xl p-4 hidden shadow-sm">
+      <div class="flex justify-between text-sm mb-1">
+        <span class="text-gray-600">Harga</span><span id="gameHarga" class="font-semibold text-gray-800">Rp0</span>
+      </div>
+      <div class="flex justify-between text-sm mb-1">
+        <span class="text-gray-600">Diskon</span><span id="gameDiskon" class="font-semibold text-red-500">- Rp0</span>
+      </div>
+      <div class="flex justify-between text-sm font-semibold text-gray-900 mb-3">
+        <span>Total Bayar</span><span id="gameTotal">Rp0</span>
+      </div>
+      <button id="gameBayar" 
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 font-semibold shadow-md hover:shadow-lg transition-all">
+        Bayar Sekarang
+      </button>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+<!-- ======= SHEET DAVIGO POINT (Dana-style, Gaming Edition) ======= -->
+<div id="davigoPointSheet" class="sheet">
+  
+  <!-- Wrapper dengan gradasi & glow -->
+  <div class="relative bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 pt-5 rounded-t-2xl overflow-hidden">
+    
+    <!-- Efek glow atas -->
+    <div class="pointer-events-none absolute inset-0 z-0">
+      <div class="w-full h-10 bg-gradient-to-b from-blue-300/80 via-indigo-300/50 to-transparent blur-lg"></div>
+    </div>
+    
+    <!-- Header -->
+    <div class="relative z-10 bg-white/10 backdrop-blur-md border-b border-white/20 text-white flex justify-between items-center px-5 py-3 rounded-t-2xl shadow-lg">
+      <span class="font-extrabold text-lg tracking-wide">🎮 Davigo Point</span>
+      <button class="closeSheetBtn text-white text-2xl leading-none hover:scale-110 hover:text-blue-200 transition">&times;</button>
+    </div>
+  </div>
+  
+  <!-- Body -->
+  <div class="body bg-white p-5">
+    <!-- Canvas game -->
+    <canvas id="carGame" width="300" height="400" 
+      class="mx-auto border rounded-lg bg-gray-100 shadow-sm"></canvas>
+
+    <!-- Kontrol layar -->
+    <div class="flex justify-center gap-6 mt-4">
+      <button id="leftBtn" 
+        class="bg-gray-200 hover:bg-gray-300 px-5 py-3 rounded-full text-xl shadow transition-colors">
+        ◀️
+      </button>
+      <button id="rightBtn" 
+        class="bg-gray-200 hover:bg-gray-300 px-5 py-3 rounded-full text-xl shadow transition-colors">
+        ▶️
+      </button>
+    </div>
+
+    <!-- Info skor & coin -->
+    <div class="mt-4 text-center space-y-1">
+      <p class="text-sm text-gray-700">Score: <span id="score" class="font-semibold">0</span></p>
+      <p class="text-sm text-gray-700">Coin Kamu: <span id="coins" class="font-semibold">0</span></p>
+      
+      <button id="redeemBtn" 
+        class="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-semibold shadow-md transition-all">
+        Tukar Coin ke Saldo
+      </button>
+
+      <button id="carRestartBtn" 
+        class="mt-2 w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl font-semibold shadow-md transition-all">
+        Mulai Ulang
+      </button> 
+    </div>
+  </div>
+</div>
+
+<!-- ================== LOADING OVERLAY ================== -->
+<div id="gf-loading" class="fixed inset-0 bg-white z-[9999] hidden flex flex-col items-center justify-start pt-12 px-4 overflow-auto">
+  <!-- Skeleton Container -->
+  <div class="w-full max-w-md space-y-4">
+    <!-- Template Skeleton Item -->
+    <template id="skeleton-template">
+      <div class="flex items-center space-x-4 animate-pulse bg-gray-100 rounded-lg p-3 shadow-xl">
+        <div class="w-12 h-12 bg-gray-300 rounded-full flex-shrink-0 shadow-inner"></div>
+        <div class="flex-1 space-y-2">
+          <div class="h-4 bg-gray-300 rounded w-3/4 shadow-inner"></div>
+          <div class="h-3 bg-gray-300 rounded w-1/2 shadow-inner"></div>
+          <div class="h-6 bg-gray-300 rounded w-1/4 mt-1 shadow-inner"></div>
+        </div>
+      </div>
+    </template>
+    
+    <div id="skeleton-list"></div>
+    
+    <p class="text-red-800 font-bold text-sm mt-4 text-center">Loading menu...</p>
+  </div>
+</div>
+
+
+
+<!-- OVERLAY PEMBAYARAN FULL SCREEN -->  <div id="overlaySuma" class="fixed inset-0 bg-white hidden z-50 overflow-y-auto">  
+  <div class="min-h-full">  
+    <!-- Header -->  
+    <div class="sticky top-0 bg-white border-b border-gray-200 px-4 py-4 flex items-center justify-between shadow-sm">  
+      <h2 class="text-xl font-bold text-gray-900">Pilih Metode Pembayaran</h2>  
+      <button id="close" class="p-2 hover:bg-gray-100 rounded-full transition-colors">  
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">  
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>  
+        </svg>  
+      </button>  
+    </div>  <!-- Content -->  
+<div class="p-4 pb-20">  
+  <!-- QRIS Section -->  
+  <div class="mb-6">  
+    <h3 class="text-lg font-semibold mb-3 text-gray-800">Quick Response (QR)</h3>  
+    <button class="pay-btn w-full p-4 rounded-xl border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all flex items-center justify-between">  
+      <div class="flex items-center">  
+        <div class="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center mr-3">  
+          <span class="text-white font-bold">QR</span>  
+        </div>  
+        <span class="font-medium">QRIS (Quick Response Indonesian Standard)</span>  
+      </div>  
+      <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">  
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>  
+      </svg>  
+    </button>  
+  </div>  
+    
+  <!-- E-Wallet Section -->  
+  <div class="mb-6">  
+    <h3 class="text-lg font-semibold mb-3 text-gray-800">E-Wallet</h3>  
+    <div class="space-y-2">  
+      <button class="pay-btn w-full p-4 rounded-xl border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all flex items-center justify-between">  
+        <div class="flex items-center">  
+          <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mr-3">  
+            <span class="text-white font-bold text-xs">OVO</span>  
+          </div>  
+          <span class="font-medium">OVO</span>  
+        </div>  
+        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">  
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>  
+        </svg>  
+      </button>  
+        
+      <button class="pay-btn w-full p-4 rounded-xl border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all flex items-center justify-between">  
+        <div class="flex items-center">  
+          <div class="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center mr-3">  
+            <span class="text-white font-bold text-xs">DANA</span>  
+          </div>  
+          <span class="font-medium">DANA</span>  
+        </div>  
+        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">  
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>  
+        </svg>  
+      </button>  
+        
+      <button class="pay-btn w-full p-4 rounded-xl border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all flex items-center justify-between">  
+        <div class="flex items-center">  
+          <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mr-3">  
+            <span class="text-white font-bold text-xs">GO</span>  
+          </div>  
+          <span class="font-medium">GoPay</span>  
+        </div>  
+        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">  
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>  
+        </svg>  
+      </button>  
+        
+      <button class="pay-btn w-full p-4 rounded-xl border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all flex items-center justify-between">  
+        <div class="flex items-center">  
+          <div class="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center mr-3">  
+            <span class="text-white font-bold text-xs">SL</span>  
+          </div>  
+          <span class="font-medium">ShopeePay</span>  
+        </div>  
+        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">  
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>  
+        </svg>  
+      </button>  
+    </div>  
+  </div>  
+    
+  <!-- Virtual Account Section -->  
+  <div class="mb-6">  
+    <h3 class="text-lg font-semibold mb-3 text-gray-800">Virtual Account</h3>  
+    <div class="space-y-2">  
+      <button class="pay-btn w-full p-4 rounded-xl border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all flex items-center justify-between">  
+        <div class="flex items-center">  
+          <div class="w-12 h-12 bg-blue-800 rounded-lg flex items-center justify-center mr-3">  
+            <span class="text-white font-bold text-xs">BCA</span>  
+          </div>  
+          <span class="font-medium">BCA Virtual Account</span>  
+        </div>  
+        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">  
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>  
+        </svg>  
+      </button>  
+        
+      <button class="pay-btn w-full p-4 rounded-xl border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all flex items-center justify-between">  
+        <div class="flex items-center">  
+          <div class="w-12 h-12 bg-red-700 rounded-lg flex items-center justify-center mr-3">  
+            <span class="text-white font-bold text-xs">BNI</span>  
+          </div>  
+          <span class="font-medium">BNI Virtual Account</span>  
+        </div>  
+        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">  
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>  
+        </svg>  
+      </button>  
+        
+      <button class="pay-btn w-full p-4 rounded-xl border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all flex items-center justify-between">  
+        <div class="flex items-center">  
+          <div class="w-12 h-12 bg-green-700 rounded-lg flex items-center justify-center mr-3">  
+            <span class="text-white font-bold text-xs">BRI</span>  
+          </div>  
+          <span class="font-medium">BRI Virtual Account</span>  
+        </div>  
+        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">  
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>  
+        </svg>  
+      </button>  
+    </div>  
+  </div>  
+    
+  <!-- Retail Section -->  
+  <div class="mb-6">  
+    <h3 class="text-lg font-semibold mb-3 text-gray-800">Retail/Minimarket</h3>  
+    <div class="space-y-2">  
+      <button class="pay-btn w-full p-4 rounded-xl border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all flex items-center justify-between">  
+        <div class="flex items-center">  
+          <div class="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center mr-3">  
+            <span class="text-white font-bold text-xs">IDM</span>  
+          </div>  
+          <span class="font-medium">Indomaret</span>  
+        </div>  
+        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">  
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>  
+        </svg>  
+      </button>  
+        
+      <button class="pay-btn w-full p-4 rounded-xl border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all flex items-center justify-between">  
+        <div class="flex items-center">  
+          <div class="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center mr-3">  
+            <span class="text-white font-bold text-xs">ALF</span>  
+          </div>  
+          <span class="font-medium">Alfamart</span>  
+        </div>  
+        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">  
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>  
+        </svg>  
+      </button>  
+    </div>  
+  </div>  
+</div>  
+  
+<!-- Footer -->  
+<div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">  
+  <button id="cancelPayment" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 rounded-xl transition-colors">  
+    🪸
+  </button>  
+</div>
+  </div>  
+</div>
+
+<!-- POPUP INPUT NOMINAL -->
+<div id="amountPopup" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+  <div class="bg-white rounded-xl w-80 max-w-full p-5 shadow-lg animate-slideUp">
+    <h3 id="popupTitle" class="text-lg font-bold mb-4">Masukkan Nominal</h3>
+    <input id="amountInput" type="number" placeholder="Masukkan nominal" 
+           class="w-full p-3 border rounded-lg mb-4 focus:outline-none focus:ring focus:ring-blue-300"/>
+    <div class="flex space-x-2">
+      <button id="confirmAmount" class="flex-1 bg-blue-600 text-white p-2 rounded-lg">OK</button>
+      <button id="cancelAmount" class="flex-1 bg-gray-200 p-2 rounded-lg">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- FULLSCREEN googleplay layout khusus voucher -->
+<div id="gplayModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+  
+<!-- Loading Spinner Google Play Gradient -->  <div id="loadingSpinner" class="flex flex-col items-center">  
+  <div class="w-10 h-10 mb-2 relative">  
+    <div class="absolute inset-0 rounded-full border-4 border-t-red-500 border-r-green-500 border-b-white-500 border-l-blue-500 animate-spin"></div>  
+  </div>  
+  <p class="text-white font-medium text-sm">Loading...</p>  
+</div>  
+
+  <!-- Isi modal (disembunyikan dulu, nanti muncul dengan animasi) -->
+<div id="modalContent" class="absolute inset-0 bg-white rounded-t-2xl shadow-lg p-5 overflow-y-auto hidden">
+
+  <!-- Tombol close -->
+  <button id="closeModal" 
+          class="absolute top-3 right-3 text-gray-500 hover:text-red-500 text-2xl font-bold">✕</button>
+
+  <!-- HEADER -->
+  <div class="flex items-center justify-between mb-4">
+    <div class="flex items-center space-x-2">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/Google_Play_Arrow_logo.svg" 
+           alt="Google Play" class="h-6">
+      <span class="font-bold text-gray-800">Rewards</span>
+    </div>
+  </div>
+
+  <!-- Selamat datang -->
+  <h2 class="text-lg font-bold text-gray-800 mb-2">Selamat datang di Zona Google Play</h2>
+
+  <!-- ===== Main Page ===== -->
+  <div id="mainPage" class="page active" style="position:relative;">
+    <!-- Voucher & Akun card -->
+    <div class="card">
+      <div class="row">
+        <div>
+          <div style="font-weight:700">Voucher saya</div>
+          <div class="small">Lihat semua voucher saya</div>
+        </div>
+        <button id="openVoucherFull" class="btn-primary">Di sini</button>
+      </div>
+    </div>
+    
+    <!-- Tabs -->
+    <div class="voucher-tabs" id="tabs">
+      <button class="tab" data-category="all">All</button>
+      <button class="tab" data-category="googleplay">Google Play</button>
+      <button class="tab" data-category="entertainment">YouTube</button>
+      <button class="tab" data-category="games">Games</button>
+      <button class="tab" data-category="shopping">Shopping</button>
+      <button class="tab" data-category="food">Food</button>
+      <button class="tab" data-category="travel">Travel</button>
+      <!-- tambahkan lagi jika perlu -->
+    </div>
+
+    <!-- Tab loading -->
+    <div id="tabLoading"><div style="width:20px;height:20px;border:3px solid #cbd5e1;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite"></div><div>Loading kupon...</div></div>
+
+    <!-- Voucher list -->
+    <div id="voucherList">
+      <!-- beberapa contoh voucher -->
+      <div class="coupon-card" data-category="googleplay">
+        <div class="left">
+          <img class="coupon-img" src="https://upload.wikimedia.org/wikipedia/commons/d/d0/Google_Play_Arrow_logo.svg" alt="">
+          <div class="coupon-info"><h3>Google Play 200GB Trial</h3><p>Untuk pengguna baru Google One</p></div>
+        </div>
+        <button class="claim-btn">KLAIM</button>
+      </div>
+
+      <div class="coupon-card" data-category="googleplay">
+        <div class="left">
+          <img class="coupon-img" src="https://upload.wikimedia.org/wikipedia/commons/d/d0/Google_Play_Arrow_logo.svg" alt="">
+          <div class="coupon-info"><h3>Voucher Rp5.000</h3><p>Min. pembelian Rp35.000</p></div>
+        </div>
+        <button class="claim-btn">KLAIM</button>
+      </div>
+
+      <div class="coupon-card" data-category="entertainment">
+        <div class="left">
+          <img class="coupon-img" src="https://img.icons8.com/color/48/youtube-play.png" alt="">
+          <div class="coupon-info"><h3>YouTube Premium</h3><p>Gratis 1 bulan</p></div>
+        </div>
+        <button class="claim-btn">KLAIM</button>
+      </div>
+      
+            <div class="coupon-card" data-category="entertainment">
+        <div class="left">
+          <img class="coupon-img" src="https://img.icons8.com/color/48/youtube-play.png" alt="">
+          <div class="coupon-info"><h3>YouTube Premium</h3><p>Gratis 1 bulan</p></div>
+        </div>
+        <button class="claim-btn">KLAIM</button>
+      </div>
+      
+            <div class="coupon-card" data-category="entertainment">
+        <div class="left">
+          <img class="coupon-img" src="https://img.icons8.com/color/48/youtube-play.png" alt="">
+          <div class="coupon-info"><h3>YouTube Premium</h3><p>Gratis 1 bulan</p></div>
+        </div>
+        <button class="claim-btn">KLAIM</button>
+      </div>
+      
+            <div class="coupon-card" data-category="entertainment">
+        <div class="left">
+          <img class="coupon-img" src="https://img.icons8.com/color/48/youtube-play.png" alt="">
+          <div class="coupon-info"><h3>YouTube Premium</h3><p>Gratis 1 bulan</p></div>
+        </div>
+        <button class="claim-btn">KLAIM</button>
+      </div>
+      
+            <div class="coupon-card" data-category="entertainment">
+        <div class="left">
+          <img class="coupon-img" src="https://img.icons8.com/color/48/youtube-play.png" alt="">
+          <div class="coupon-info"><h3>YouTube Premium</h3><p>Gratis 1 bulan</p></div>
+        </div>
+        
+        <button class="claim-btn">KLAIM</button>
+      </div>
+      <div class="coupon-card" data-category="games">
+        <div class="left">
+          <img class="coupon-img" src="https://img.icons8.com/color/48/controller.png" alt="">
+          <div class="coupon-info"><h3>Game Credits</h3><p>Voucher khusus game</p></div>
+        </div>
+        <button class="claim-btn">KLAIM</button>
+      </div>
+      
+      <div class="coupon-card" data-category="games">
+        <div class="left">
+          <img class="coupon-img" src="https://img.icons8.com/color/48/controller.png" alt="">
+          <div class="coupon-info"><h3>Bonus Item</h3><p>Skin eksklusif gratis</p></div>
+        </div>
+        <button class="claim-btn">KLAIM</button>
+      </div>
+      <!--tambahin voucher di sini-->
+    </div>
+  </div>
+
+  <!-- ===== Fullscreen Voucher Page ===== -->
+  <div id="voucherPage" class="page" aria-hidden="true">
+    <div class="topbar">
+      <button id="backBtn" class="back-btn">� Kembali</button>
+      <div style="font-weight:700" id="voucherPageTitle">Voucher</div>
+    </div>
+    
+  <!-- ===== Halaman Voucher (Full Screen) ===== -->
+  <div id="voucherdi">
+    <div class="voucher-header">
+      <h2>Reward Saya</h2>
+      <p style="font-size:12px">Cek vouchermu disini!</p>
+    </div>
+    
+  <!-- Banner promo -->
+  <div class="w-full h-28 rounded-lg overflow-hidden mb-4">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Google_Play_2022_logo.svg" 
+         class="w-full h-full object-cover" alt="Promo Banner">
+  </div>
+    <!-- Tabs -->
+    <div class="voucher-tabs">
+      <button class="active" onclick="switchTab('voucher', this)">Voucher</button>
+      <button onclick="switchTab('kartu', this)">Kartu</button>
+      <button onclick="switchTab('langganan', this)">Langganan</button>
+    </div>
+
+    <!-- tempat isi voucher full screen (diisi lewat JS saat buka)
+    -->
+    <div id="voucherPageContent"></div>
+  </div>
+  
+
+
+
+  <!-- JS dipanggil di akhir BODY -->
+  <script src="script.js"></script>
+</body> 
+</html>
