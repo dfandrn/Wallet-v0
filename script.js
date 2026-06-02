@@ -1,1 +1,4305 @@
-hh
+/* ========= Helpers ========= */
+    const rupiah = n => 'Rp' + (n||0).toLocaleString('id-ID');
+    const qs  = s => document.querySelector(s);
+    const qsa = s => Array.from(document.querySelectorAll(s));
+    const storage = {
+      get(k,def){ try{ const v = JSON.parse(localStorage.getItem(k)); return (v===null||v===undefined)?def:v; }catch(e){ return def; } },
+      set(k,v){ localStorage.setItem(k, JSON.stringify(v)); },
+      del(k){ localStorage.removeItem(k); }
+    };
+
+    const BAL_KEY = 'dana_balance';
+    const PIN_KEY = 'dana_pin';
+    const LOGIN_KEY = 'dana_logged_in';
+    const TX_KEY = 'dana_history';
+
+
+
+/* ========= Professional Toast & Modal System ========= */
+/* ========= Professional Toast & Modal System - FINAL VERSION ========= */
+class NotificationSystem {
+  static show(message, type = 'info', duration = 3000) {
+    const toast = document.createElement('div');
+    
+    // Professional SVG Icons
+    const icons = {
+      success: `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+      </svg>`,
+      error: `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+      </svg>`,
+      warning: `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+      </svg>`,
+      info: `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+      </svg>`,
+      loading: `<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>`,
+      security: `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+      </svg>`,
+      money: `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"></path>
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"></path>
+      </svg>`,
+      phone: `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path>
+      </svg>`,
+      otp: `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 2 2 0 012 2 1 1 0 102 0 4 4 0 00-4-4z" clip-rule="evenodd"></path>
+      </svg>`,
+      pin: `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path>
+      </svg>`
+    };
+    
+    // Toast styling berdasarkan type
+    const styles = {
+      success: 'bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-emerald-500/25',
+      error: 'bg-gradient-to-r from-red-500 to-rose-600 text-white shadow-red-500/25',
+      warning: 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-amber-500/25',
+      info: 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-blue-500/25',
+      loading: 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-violet-500/25',
+      security: 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-red-600/30',
+      money: 'bg-gradient-to-r from-green-600 to-emerald-700 text-white shadow-green-600/25',
+      phone: 'bg-gradient-to-r from-blue-600 to-cyan-700 text-white shadow-blue-600/25',
+      otp: 'bg-gradient-to-r from-indigo-600 to-purple-700 text-white shadow-indigo-600/25',
+      pin: 'bg-gradient-to-r from-gray-600 to-slate-700 text-white shadow-gray-600/25'
+    };
+    
+    toast.className = `fixed top-4 right-4 z-[9999] px-5 py-4 rounded-2xl shadow-2xl transform translate-x-full transition-all duration-500 ease-out max-w-sm backdrop-blur-sm border border-white/10 ${styles[type] || styles.info}`;
+    
+    toast.innerHTML = `
+      <div class="flex items-center space-x-3">
+        <div class="flex-shrink-0 ${type === 'loading' ? '' : 'animate-pulse'}">
+          ${icons[type] || icons.info}
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-semibold text-sm leading-relaxed">${message}</p>
+        </div>
+        ${type !== 'loading' ? `
+          <button onclick="this.parentElement.parentElement.style.transform='translateX(100%)'; setTimeout(() => this.parentElement.parentElement.remove(), 300)" class="flex-shrink-0 ml-2 opacity-70 hover:opacity-100 transition-opacity">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+            </svg>
+          </button>
+        ` : ''}
+      </div>
+    `;
+    
+    // Add to DOM
+    document.body.appendChild(toast);
+    
+    // Show animation dengan bounce effect
+    requestAnimationFrame(() => {
+      toast.style.transform = 'translateX(0) scale(1.02)';
+      setTimeout(() => {
+        toast.style.transform = 'translateX(0) scale(1)';
+      }, 150);
+    });
+    
+    // Auto remove untuk non-loading toasts
+    if (type !== 'loading') {
+      setTimeout(() => {
+        if (toast.parentElement) {
+          toast.style.transform = 'translateX(100%) scale(0.95)';
+          setTimeout(() => toast.remove(), 500);
+        }
+      }, duration);
+    }
+    
+    return toast;
+  }
+  
+  // Specialized notification methods
+  static showSuccess(message, duration = 3000) {
+    return this.show(message, 'success', duration);
+  }
+  
+  static showError(message, duration = 4000) {
+    return this.show(message, 'error', duration);
+  }
+  
+  static showWarning(message, duration = 3500) {
+    return this.show(message, 'warning', duration);
+  }
+  
+  static showInfo(message, duration = 3000) {
+    return this.show(message, 'info', duration);
+  }
+  
+  static showLoading(message) {
+    return this.show(message, 'loading', 0);
+  }
+  
+  static showSecurity(message, duration = 5000) {
+    return this.show(message, 'security', duration);
+  }
+  
+  static showMoney(message, duration = 4000) {
+    return this.show(message, 'money', duration);
+  }
+  
+  static showPhone(message, duration = 3000) {
+    return this.show(message, 'phone', duration);
+  }
+  
+  static showOTP(message, duration = 5000) {
+    return this.show(message, 'otp', duration);
+  }
+  
+  static showPIN(message, duration = 3000) {
+    return this.show(message, 'pin', duration);
+  }
+  
+  static hideLoading(toast) {
+    if (toast && toast.parentElement) {
+      toast.style.transform = 'translateX(100%) scale(0.95)';
+      setTimeout(() => toast.remove(), 500);
+    }
+  }
+  
+  // Clear all notifications
+  static clearAll() {
+    document.querySelectorAll('[class*="fixed top-4 right-4"]').forEach(toast => {
+      toast.style.transform = 'translateX(100%) scale(0.95)';
+      setTimeout(() => toast.remove(), 300);
+    });
+  }
+}
+
+/* ========= Professional Login / PIN System - UPDATED WITH BETTER NOTIFICATIONS ========= */
+const verifyWrap = document.getElementById('startupVerify');
+const stepPhone  = document.getElementById('verifyStepPhone');
+const stepOTP    = document.getElementById('verifyStepOTP');
+const stepSetPIN = document.getElementById('verifyStepSetPIN');
+const stepPIN    = document.getElementById('verifyStepPIN');
+const MOCK_OTP = '123456';
+
+let currentStep = null;
+let isTransitioning = false;
+
+// Enhanced step transition with animations - FIXED VERSION
+function showStep(el, direction = 'forward') {
+  if (isTransitioning) return;
+  if (!el) return;
+  
+  isTransitioning = true;
+  
+  const steps = [stepPhone, stepOTP, stepSetPIN, stepPIN];
+  
+  // Exit animation for current step
+  if (currentStep && currentStep !== el) {
+    currentStep.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+    currentStep.style.transform = direction === 'forward' ? 'translateX(-100%)' : 'translateX(100%)';
+    currentStep.style.opacity = '0';
+    
+    setTimeout(() => {
+      currentStep.classList.add('hidden');
+      currentStep.style.transform = '';
+      currentStep.style.opacity = '';
+      currentStep.style.transition = '';
+    }, 300);
+  }
+  
+  // Entry animation for new step
+  setTimeout(() => {
+    steps.forEach(x => x.classList.add('hidden'));
+    el.classList.remove('hidden');
+    
+    el.style.transform = '';
+    el.style.opacity = '';
+    el.style.transition = '';
+    
+    if (currentStep && currentStep !== el) {
+      el.style.transform = direction === 'forward' ? 'translateX(100%)' : 'translateX(-100%)';
+      el.style.opacity = '0';
+      
+      requestAnimationFrame(() => {
+        el.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+        el.style.transform = 'translateX(0)';
+        el.style.opacity = '1';
+        
+        setTimeout(() => {
+          el.style.transition = '';
+          el.style.transform = '';
+          el.style.opacity = '';
+          currentStep = el;
+          isTransitioning = false;
+        }, 400);
+      });
+    } else {
+      currentStep = el;
+      isTransitioning = false;
+    }
+  }, currentStep && currentStep !== el ? 150 : 0);
+}
+
+// Enhanced PIN button click handler
+document.getElementById('havePinBtn').addEventListener('click', async ()=>{
+  const btn = document.getElementById('havePinBtn');
+  const originalText = btn.innerHTML;
+  
+  btn.innerHTML = `
+    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+    Memeriksa...
+  `;
+  btn.disabled = true;
+  
+  await new Promise(resolve => setTimeout(resolve, 800));
+  
+  const saved = storage.get(PIN_KEY,null);
+  if(saved){ 
+    showStep(stepPIN);
+    NotificationSystem.showPIN('PIN ditemukan! Silakan masukkan PIN Anda.');
+  } else { 
+    NotificationSystem.showWarning('Belum ada PIN tersimpan. Silakan buat PIN baru.');
+  }
+  
+  btn.innerHTML = originalText;
+  btn.disabled = false;
+});
+
+// Enhanced OTP functions with professional feedback
+async function startupSendOTP(){
+  const phoneInput = document.getElementById('startupPhone');
+  const phone = phoneInput.value.trim();
+  const btn = event.target;
+  
+  phoneInput.classList.remove('border-red-500', 'border-green-500');
+  
+  if(!/^0[0-9]{9,13}$/.test(phone)){ 
+    phoneInput.classList.add('border-red-500');
+    phoneInput.focus();
+    NotificationSystem.showError('Nomor HP tidak valid. Gunakan format 08xxxxxxxxxx');
+    return; 
+  }
+  
+  phoneInput.classList.add('border-green-500');
+  
+  const originalText = btn.innerHTML;
+  btn.innerHTML = `
+    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+    Mengirim OTP...
+  `;
+  btn.disabled = true;
+  
+  await new Promise(resolve => setTimeout(resolve, 2000));
+  
+  NotificationSystem.showPhone(`OTP berhasil dikirim ke ${phone.replace(/(\d{4})(\d{4})(\d+)/, '$1-$2-$3')}`);
+  setTimeout(() => {
+    NotificationSystem.showOTP(`Demo: Gunakan kode ${MOCK_OTP}`);
+  }, 1000);
+  
+  showStep(stepOTP);
+  
+  btn.innerHTML = originalText;
+  btn.disabled = false;
+}
+
+async function startupResendOTP(){ 
+  const btn = event.target;
+  const originalText = btn.innerHTML;
+  
+  btn.innerHTML = `
+    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-600 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+    Mengirim ulang...
+  `;
+  btn.disabled = true;
+  
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  
+  NotificationSystem.showSuccess('OTP baru telah dikirim!');
+  setTimeout(() => {
+    NotificationSystem.showOTP(`Demo: Gunakan kode ${MOCK_OTP}`);
+  }, 1000);
+  
+  btn.innerHTML = originalText;
+  btn.disabled = false;
+}
+
+async function startupVerifyOTP(){
+  const otpInput = document.getElementById('startupOTP');
+  const otp = otpInput.value.trim();
+  const btn = event.target;
+  
+  otpInput.classList.remove('border-red-500', 'border-green-500');
+  
+  if (!otp) {
+    otpInput.classList.add('border-red-500');
+    otpInput.focus();
+    NotificationSystem.showWarning('Silakan masukkan kode OTP');
+    return;
+  }
+  
+  const originalText = btn.innerHTML;
+  btn.innerHTML = `
+    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+    Memverifikasi...
+  `;
+  btn.disabled = true;
+  
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  
+  if(otp === MOCK_OTP){ 
+    otpInput.classList.add('border-green-500');
+    NotificationSystem.showSuccess('OTP berhasil diverifikasi!');
+    setTimeout(() => showStep(stepSetPIN), 800);
+  } else {
+    otpInput.classList.add('border-red-500');
+    otpInput.focus();
+    otpInput.select();
+    NotificationSystem.showError('Kode OTP salah. Silakan coba lagi.');
+  }
+  
+  btn.innerHTML = originalText;
+  btn.disabled = false;
+}
+
+async function startupSavePIN(){
+  const p1Input = document.getElementById('startupSetPIN1');
+  const p2Input = document.getElementById('startupSetPIN2');
+  const p1 = p1Input.value.trim();
+  const p2 = p2Input.value.trim();
+  const btn = event.target;
+  
+  [p1Input, p2Input].forEach(input => {
+    input.classList.remove('border-red-500', 'border-green-500');
+  });
+  
+  if(!/^[0-9]{6}$/.test(p1)){ 
+    p1Input.classList.add('border-red-500');
+    p1Input.focus();
+    NotificationSystem.showError('PIN harus terdiri dari 6 digit angka');
+    return; 
+  }
+  
+  if(p1 !== p2){ 
+    p2Input.classList.add('border-red-500');
+    p2Input.focus();
+    p2Input.select();
+    NotificationSystem.showError('Konfirmasi PIN tidak sesuai');
+    return; 
+  }
+  
+  [p1Input, p2Input].forEach(input => input.classList.add('border-green-500'));
+  
+  const originalText = btn.innerHTML;
+  btn.innerHTML = `
+    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+    Menyimpan PIN...
+  `;
+  btn.disabled = true;
+  
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  
+  storage.set(PIN_KEY, p1);
+  storage.set(LOGIN_KEY, true);
+  
+  NotificationSystem.showSuccess('PIN berhasil dibuat! Selamat datang!');
+  
+  setTimeout(() => {
+    verifyWrap.style.display = 'none';
+    initAfterLogin();
+  }, 1000);
+}
+
+async function startupVerifyPIN(){
+  const pinInput = document.getElementById('startupPIN');
+  const pin = pinInput.value.trim();
+  const saved = storage.get(PIN_KEY, null);
+  const btn = event.target;
+  
+  pinInput.classList.remove('border-red-500', 'border-green-500');
+  
+  if (!pin) {
+    pinInput.classList.add('border-red-500');
+    pinInput.focus();
+    NotificationSystem.showWarning('Silakan masukkan PIN Anda');
+    return;
+  }
+  
+  const originalText = btn.innerHTML;
+  btn.innerHTML = `
+    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+    Memverifikasi...
+  `;
+  btn.disabled = true;
+  
+  await new Promise(resolve => setTimeout(resolve, 1200));
+  
+  if(saved && pin === saved){
+    pinInput.classList.add('border-green-500');
+    storage.set(LOGIN_KEY, true);
+    NotificationSystem.showSuccess('Login berhasil! Selamat datang kembali!');
+    
+    setTimeout(() => {
+      verifyWrap.style.display = 'none';
+      initAfterLogin();
+    }, 1000);
+  } else {
+    pinInput.classList.add('border-red-500');
+    pinInput.focus();
+    pinInput.select();
+    NotificationSystem.showError('PIN salah. Silakan coba lagi.');
+  }
+  
+  btn.innerHTML = originalText;
+  btn.disabled = false;
+}
+
+// Global function assignments
+window.startupSendOTP = startupSendOTP;
+window.startupResendOTP = startupResendOTP;
+window.startupVerifyOTP = startupVerifyOTP;
+window.startupSavePIN = startupSavePIN;
+window.startupVerifyPIN = startupVerifyPIN;
+
+// Enhanced scroll lock management
+(function(){
+  const main = document.getElementById('mainScroll');
+  const obs = new MutationObserver(()=>{ 
+    if(verifyWrap.style.display === 'none') {
+      main.style.overflow = 'auto';
+      document.body.style.overflow = '';
+    } else {
+      main.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+    }
+  });
+  obs.observe(verifyWrap,{attributes:true, attributeFilter:['style']});
+  if(verifyWrap.style.display !== 'none') {
+    main.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+  }
+})();
+
+// Enhanced logout function - FINAL FIXED VERSION
+function logout(){
+  const loadingToast = NotificationSystem.showLoading('Logging out...');
+  
+  setTimeout(() => {
+    storage.set(LOGIN_KEY, false);
+    
+    // Reset state variables
+    currentStep = null;
+    isTransitioning = false;
+    // Reset semua step ke kondisi awal
+    [stepPhone, stepOTP, stepSetPIN, stepPIN].forEach(step => {
+      step.classList.add('hidden');
+      step.style.transform = '';
+      step.style.opacity = '';
+      step.style.transition = '';
+    });
+    
+    // Show verify wrap dan step yang tepat
+    verifyWrap.style.display = 'flex';
+    
+    // Tentukan step mana yang harus ditampilkan
+    const hasPin = storage.get(PIN_KEY, null);
+    const targetStep = hasPin ? stepPIN : stepPhone;
+    
+    // Show step tanpa animasi karena baru logout
+    targetStep.classList.remove('hidden');
+    currentStep = targetStep;
+    
+    // Clear input fields untuk security
+    const pinInput = document.getElementById('startupPIN');
+    if (pinInput) pinInput.value = '';
+    
+    NotificationSystem.hideLoading(loadingToast);
+    NotificationSystem.show('Logout berhasil. Silakan login kembali.', 'info');
+  }, 1000);
+}
+
+// Balance initialization with animation
+function initBalance(){
+  let b = storage.get(BAL_KEY, null);
+  if(b === null){ b = 1487500; storage.set(BAL_KEY, b); }
+  
+  // Animated counter
+  const balanceEl = document.getElementById('balance');
+  const start = 0;
+  const end = b;
+  const duration = 1500;
+  const startTime = Date.now();
+  
+  function updateCounter() {
+    const now = Date.now();
+    const progress = Math.min((now - startTime) / duration, 1);
+    const current = Math.floor(start + (end - start) * progress);
+    
+    balanceEl.innerText = current.toLocaleString('id-ID');
+    
+    if (progress < 1) {
+      requestAnimationFrame(updateCounter);
+    }
+  }
+  
+  updateCounter();
+}
+
+function initAfterLogin(){
+  initBalance();
+  renderHistory();
+  
+  // Welcome animation
+  setTimeout(() => {
+    NotificationSystem.show('Dashboard siap digunakan!', 'success');
+  }, 500);
+}
+
+// Enhanced boot sequence
+(function boot(){
+  if(storage.get(LOGIN_KEY, false)){ 
+    verifyWrap.style.display = 'none'; 
+    initAfterLogin(); 
+  } else { 
+    verifyWrap.style.display = 'flex'; 
+    const hasPin = storage.get(PIN_KEY, null); 
+    showStep(hasPin ? stepPIN : stepPhone);
+  }
+})();
+
+/* ========= Enhanced Bottom Nav Tabs ========= */
+const sections = {
+  tabHome: 'homeSection',
+  tabAktivitas: 'activitySection',
+  tabWallet: 'walletSection'
+};
+
+let currentActiveTab = 'tabHome';
+let isTabTransitioning = false;
+
+Object.keys(sections).forEach(tabId => {
+  const btn = document.getElementById(tabId);
+  btn.addEventListener('click', async () => {
+    if (isTabTransitioning) return;
+    
+    // Protection check
+    if(verifyWrap.style.display !== 'none'){ 
+      showSecurityAlert();
+      return; 
+    }
+    
+    // Skip if already active
+    if (btn.classList.contains('active')) return;
+    
+    isTabTransitioning = true;
+    
+    // Haptic feedback
+    if (navigator.vibrate) {
+      navigator.vibrate([10]);
+    }
+    
+    // Tab button animations
+    const allTabs = qsa('.bottom-nav button');
+    allTabs.forEach(b => {
+      b.classList.remove('active');
+      b.style.transform = 'scale(1)';
+    });
+    
+    btn.classList.add('active');
+    btn.style.transform = 'scale(1.1)';
+    
+    setTimeout(() => {
+      btn.style.transform = 'scale(1)';
+    }, 150);
+    
+    // Section transitions
+    const currentSection = qs('#' + sections[currentActiveTab]);
+    const newSection = qs('#' + sections[tabId]);
+    
+    // Exit animation
+    currentSection.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+    currentSection.style.transform = 'translateX(-100%)';
+    currentSection.style.opacity = '0';
+    
+    setTimeout(() => {
+      currentSection.classList.add('hidden');
+      currentSection.style.transform = '';
+      currentSection.style.opacity = '';
+      
+      // Entry animation
+      newSection.classList.remove('hidden');
+      newSection.style.transform = 'translateX(100%)';
+      newSection.style.opacity = '0';
+      
+      requestAnimationFrame(() => {
+        newSection.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+        newSection.style.transform = 'translateX(0)';
+        newSection.style.opacity = '1';
+        
+        setTimeout(() => {
+          newSection.style.transition = '';
+          newSection.style.transform = '';
+          newSection.style.opacity = '';
+          currentActiveTab = tabId;
+          isTabTransitioning = false;
+        }, 300);
+      });
+    }, 150);
+    
+    // Update page title
+    const tabNames = {
+      tabHome: 'Beranda',
+      tabAktivitas: 'Aktivitas',
+      tabWallet: 'Wallet'
+    };
+    
+    // Show subtle notification for tab change
+    setTimeout(() => {
+      NotificationSystem.show(`Beralih ke ${tabNames[tabId]}`, 'info', 1500);
+    }, 400);
+  });
+});
+    
+// ===== Modal Logout Professional dengan Efek Animasi Advanced =====
+document.addEventListener('DOMContentLoaded', () => {
+  
+  const modalHTML = `
+  <div id="logoutModal" class="fixed inset-0 flex items-center justify-center opacity-0 pointer-events-none z-50" style="backdrop-filter: blur(0px); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);">
+    <div class="absolute inset-0 bg-gradient-to-br from-black/20 via-black/40 to-black/60"></div>
+    <div class="relative bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-96 p-8 text-center transform transition-all duration-500 ease-out translate-y-8 scale-90 rotate-1" style="box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1);">
+      <!-- Icon Container dengan Pulse Effect -->
+      <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900/30 dark:to-red-800/30 rounded-full flex items-center justify-center relative overflow-hidden">
+        <div class="absolute inset-0 bg-red-500/20 rounded-full animate-ping"></div>
+        <svg class="w-10 h-10 text-red-500 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+        </svg>
+      </div>
+      
+      <!-- Title dengan Gradient Text -->
+      <h2 class="text-2xl font-bold mb-3 bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">Konfirmasi Logout</h2>
+      <p class="mb-8 text-gray-600 dark:text-gray-400 text-base leading-relaxed">Apakah kamu yakin ingin keluar dari sesi ini?<br><span class="text-sm opacity-75">Kamu perlu login kembali untuk mengakses akun.</span></p>
+      
+      <!-- Button Container dengan Hover Effects -->
+      <div class="flex justify-center space-x-4">
+        <button id="cancelLogout" class="group relative px-8 py-3 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-xl font-medium transition-all duration-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-gray-300/50 dark:focus:ring-gray-600/50 overflow-hidden">
+          <span class="relative z-10">Batal</span>
+          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform translate-x-full group-hover:translate-x-0 transition-transform duration-500"></div>
+        </button>
+        
+        <button id="confirmLogout" class="group relative px-8 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl font-medium transition-all duration-300 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-red-300/50 dark:focus:ring-red-800/50 overflow-hidden">
+          <span class="relative z-10 flex items-center">
+            <svg class="w-4 h-4 mr-2 transition-transform duration-300 group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+            </svg>
+            Logout
+          </span>
+          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform translate-x-full group-hover:translate-x-0 transition-transform duration-500"></div>
+        </button>
+      </div>
+    </div>
+  </div>
+  `;
+  
+  // Sisipkan modal ke body
+  document.body.insertAdjacentHTML('beforeend', modalHTML);
+  
+  // Ambil elemen modal & tombol
+  const tabLogout = document.getElementById('tabLogout');
+  const logoutModal = document.getElementById('logoutModal');
+  const modalContent = logoutModal.querySelector('.relative'); // inner card
+  const cancelLogout = document.getElementById('cancelLogout');
+  const confirmLogout = document.getElementById('confirmLogout');
+  
+  // Simpan HTML asli tombol logout
+  const originalLogoutHTML = confirmLogout.innerHTML;
+  
+  // Fungsi untuk reset tombol logout ke kondisi semula
+  function resetLogoutButton() {
+    if (confirmLogout) {
+      confirmLogout.innerHTML = originalLogoutHTML;
+      confirmLogout.disabled = false;
+      confirmLogout.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+  }
+  
+  // Fungsi buka modal dengan animasi canggih
+  function openLogoutModal() {
+    // Reset tombol setiap kali modal dibuka
+    resetLogoutButton();
+    
+    // Disable scroll pada body
+    document.body.style.overflow = 'hidden';
+    
+    logoutModal.classList.remove('opacity-0', 'pointer-events-none');
+    logoutModal.classList.add('opacity-100');
+    logoutModal.style.backdropFilter = 'blur(12px)';
+    
+    // Animasi masuk dengan efek spring
+    requestAnimationFrame(() => {
+      modalContent.style.transition = 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+      modalContent.style.transform = 'translateY(0) scale(1) rotate(0deg)';
+      modalContent.style.opacity = '1';
+    });
+    
+    // Tambah efek particles (opsional)
+    createFloatingParticles();
+  }
+  
+  // Fungsi tutup modal dengan animasi smooth
+  function closeLogoutModal() {
+    // Enable scroll pada body
+    document.body.style.overflow = '';
+    
+    modalContent.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 1, 1)';
+    modalContent.style.transform = 'translateY(20px) scale(0.95) rotate(-1deg)';
+    modalContent.style.opacity = '0';
+    
+    logoutModal.style.backdropFilter = 'blur(0px)';
+    
+    // Reset tombol logout ke kondisi semula
+    resetLogoutButton();
+    
+    setTimeout(() => {
+      logoutModal.classList.add('opacity-0', 'pointer-events-none');
+      logoutModal.classList.remove('opacity-100');
+    }, 200);
+  }
+  
+  // Fungsi untuk membuat efek floating particles
+  function createFloatingParticles() {
+    for (let i = 0; i < 6; i++) {
+      const particle = document.createElement('div');
+      particle.style.cssText = `
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: rgba(239, 68, 68, 0.6);
+        border-radius: 50%;
+        pointer-events: none;
+        animation: float-particle 3s ease-out forwards;
+        top: 50%;
+        left: 50%;
+        z-index: 1;
+      `;
+      
+      const angle = (i / 6) * Math.PI * 2;
+      const distance = 100 + Math.random() * 50;
+      
+      particle.style.setProperty('--end-x', `${Math.cos(angle) * distance}px`);
+      particle.style.setProperty('--end-y', `${Math.sin(angle) * distance}px`);
+      
+      modalContent.appendChild(particle);
+      
+      setTimeout(() => particle.remove(), 3000);
+    }
+  }
+  
+  // Tambah keyframes untuk animasi particles
+  const styleSheet = document.createElement('style');
+  styleSheet.textContent = `
+    @keyframes float-particle {
+      0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        transform: translate(calc(-50% + var(--end-x)), calc(-50% + var(--end-y))) scale(1);
+        opacity: 0;
+      }
+    }
+    
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+  `;
+  document.head.appendChild(styleSheet);
+  
+  // Event listeners dengan efek ripple
+  function addRippleEffect(button, event) {
+    const rect = button.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    const x = event.clientX - rect.left - size / 2;
+    const y = event.clientY - rect.top - size / 2;
+    
+    const ripple = document.createElement('span');
+    ripple.style.cssText = `
+      position: absolute;
+      width: ${size}px;
+      height: ${size}px;
+      left: ${x}px;
+      top: ${y}px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      transform: scale(0);
+      animation: ripple 0.6s ease-out;
+      pointer-events: none;
+    `;
+    
+    button.style.position = 'relative';
+    button.style.overflow = 'hidden';
+    button.appendChild(ripple);
+    
+    setTimeout(() => ripple.remove(), 600);
+  }
+  
+  // Event tombol dengan ripple effects
+  tabLogout?.addEventListener('click', openLogoutModal);
+  
+  cancelLogout?.addEventListener('click', (e) => {
+    addRippleEffect(cancelLogout, e);
+    setTimeout(closeLogoutModal, 100);
+  });
+  
+  confirmLogout?.addEventListener('click', (e) => {
+    // Cegah double click
+    if (confirmLogout.disabled) return;
+    
+    addRippleEffect(confirmLogout, e);
+    
+    // Disable tombol dan ubah ke loading state
+    confirmLogout.disabled = true;
+    confirmLogout.classList.add('opacity-75', 'cursor-not-allowed');
+    
+    // Animasi loading pada tombol
+    confirmLogout.innerHTML = `
+      <span class="relative z-10 flex items-center">
+        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Logging out...
+      </span>
+    `;
+    
+    setTimeout(() => {
+      try {
+        logout(); // panggil fungsi logout asli
+      } catch (error) {
+        console.error('Logout error:', error);
+      } finally {
+        // Reset tombol dan tutup modal
+        resetLogoutButton();
+        closeLogoutModal();
+      }
+    }, 1000);
+  });
+  
+  // Klik di luar modal untuk menutup dengan efek
+  logoutModal.addEventListener('click', (e) => {
+    if (e.target === logoutModal || e.target.closest('.absolute.inset-0')) {
+      closeLogoutModal();
+    }
+  });
+  
+  // Keyboard support (ESC untuk tutup)
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !logoutModal.classList.contains('opacity-0')) {
+      closeLogoutModal();
+    }
+  });
+  
+  // Tambah CSS untuk ripple animation
+  const rippleStyle = document.createElement('style');
+  rippleStyle.textContent = `
+    @keyframes ripple {
+      to {
+        transform: scale(2);
+        opacity: 0;
+      }
+    }
+  `;
+  document.head.appendChild(rippleStyle);
+  
+});
+
+    /* ========= Proteksi klik fitur sebelum login ========= */
+    const protectIds = ["topUpBtn","withdrawBtn","pulsaDataBtn","listrikBtn","googlePlayBtn","topUpGameBtn","dagetBtn","dataPlusBtn","sendMoneyBtn","qrPayBtn","danaPolyBtn","rewardBtn","danaDealsBtn"];
+    protectIds.forEach(id=>{
+      const el = document.getElementById(id);
+      if(!el) return;
+      el.addEventListener('click', (e)=>{
+        if(verifyWrap.style.display !== 'none'){ e.preventDefault(); alert('Silakan verifikasi terlebih dahulu.'); }
+      });
+    });
+
+    /* ========= SHEET Controls ========= */
+const pulsaSheet    = document.getElementById('pulsaSheet');
+const listrikSheet    = document.getElementById('listrikSheet');
+const topUpGameSheet  = document.getElementById('topUpGameSheet');
+const davigoGameSheet = document.getElementById('davigoGameSheet'); // NEW
+
+document.getElementById('pulsaDataBtn').addEventListener('click', ()=> openSheet(pulsaSheet));
+document.getElementById('listrikBtn').addEventListener('click', ()=> openSheet(listrikSheet));
+document.getElementById('topUpGameBtn').addEventListener('click', ()=> openSheet(topUpGameSheet));
+
+
+function openSheet(el){ el.classList.add('open'); }
+function closeSheet(el){ el.classList.remove('open'); }
+
+// ESC buat nutup semua sheet
+document.addEventListener('keydown', (e)=>{ 
+  if(e.key==='Escape'){ 
+    closeSheet(pulsaSheet);  
+    closeSheet(listrikSheet);
+    closeSheet(topUpGameSheet);
+    closeSheet(davigoGameSheet); // NEW
+  }
+});
+
+const davigoPointSheet = document.getElementById('davigoPointSheet');
+
+document.getElementById('davigoPointBtn')
+  .addEventListener('click', ()=> openSheet(davigoPointSheet));
+
+document.addEventListener('keydown', (e)=>{ 
+  if(e.key==='Escape'){ 
+    closeSheet(davigoPointSheet);
+  }
+});
+
+    /* ========= Pulsa/Data Logic ========= */
+    const pulsaProducts = [
+      // nominal, harga, diskon (rupiah), label
+      {nominal:'5.000',  harga:6000,  diskon:500,  label:'Pulsa 5K'},
+      {nominal:'10.000', harga:11000, diskon:1000, label:'Pulsa 10K'},
+      {nominal:'15.000', harga:16000, diskon:1500, label:'Pulsa 15K'},
+      {nominal:'20.000', harga:21000, diskon:2000, label:'Pulsa 20K'},
+      {nominal:'25.000', harga:26000, diskon:2500, label:'Pulsa 25K'},
+      {nominal:'30.000', harga:31000, diskon:3000, label:'Pulsa 30K'},
+      {nominal:'40.000', harga:41000, diskon:3500, label:'Pulsa 40K'},
+      {nominal:'50.000', harga:51000, diskon:4000, label:'Pulsa 50K'},
+      {nominal:'75.000', harga:76000, diskon:5000, label:'Pulsa 75K'},
+      {nominal:'100.000',harga:101000,diskon:7000, label:'Pulsa 100K'},
+      // paket data contoh
+      {nominal:'Data 2GB/7hr',  harga:15000, diskon:2000, label:'Paket Data'},
+      {nominal:'Data 5GB/15hr', harga:35000, diskon:5000, label:'Paket Data'},
+      {nominal:'Data 10GB/30hr',harga:65000, diskon:8000, label:'Paket Data'},
+    ];
+
+    const pulsaGrid = document.getElementById('pulsaGrid');
+let pulsaSelected = null;
+
+function renderPulsaGrid(){
+  pulsaGrid.innerHTML = '';
+  pulsaProducts.forEach((p,i)=>{
+    const div = document.createElement('div');
+    div.className = 'price-card';
+    div.innerHTML = `
+      <div class="text-sm font-semibold">${p.label.includes('Data')?p.label:('Pulsa')}</div>
+      <div class="text-xs text-gray-600">${p.nominal}</div>
+      <div class="flex items-center justify-between mt-1">
+        <div class="text-sm font-semibold">${rupiah(p.harga - p.diskon)}</div>
+        <span class="pill">- ${rupiah(p.diskon)}</span>
+      </div>`;
+    div.addEventListener('click',()=>{
+      pulsaSelected = i;
+      qsa('#pulsaGrid .price-card').forEach(x=>x.classList.remove('active'));
+      div.classList.add('active');
+      updatePulsaSummary();
+    });
+    pulsaGrid.appendChild(div);
+  });
+}
+renderPulsaGrid();
+
+function updatePulsaSummary(){
+  const sum = document.getElementById('pulsaSummary');
+  if(pulsaSelected===null){ sum.classList.add('hidden'); return; }
+  const p = pulsaProducts[pulsaSelected];
+  document.getElementById('pulsaHarga').innerText  = rupiah(p.harga);
+  document.getElementById('pulsaDiskon').innerText = '- ' + rupiah(p.diskon);
+  document.getElementById('pulsaTotal').innerText  = rupiah(p.harga - p.diskon);
+  sum.classList.remove('hidden');
+}
+
+document.getElementById('pulsaReset').addEventListener('click', ()=>{
+  pulsaSelected=null; 
+  qsa('#pulsaGrid .price-card').forEach(x=>x.classList.remove('active'));
+  document.getElementById('pulsaSummary').classList.add('hidden');
+  document.getElementById('pulsaPhone').value='';
+});
+
+document.getElementById('pulsaBayar').addEventListener('click', ()=>{
+  const phone = document.getElementById('pulsaPhone').value.trim();
+  if(!/^0[0-9]{9,13}$/.test(phone)){ showPopup('error','Nomor HP tidak valid'); return; }
+  if(pulsaSelected===null){ showPopup('error','Pilih nominal dulu'); return; }
+  const p = pulsaProducts[pulsaSelected];
+  const total = p.harga - p.diskon;
+  let bal = storage.get(BAL_KEY,0);
+  if(bal < total){ showPopup('error','Saldo tidak cukup'); return; }
+  bal -= total; storage.set(BAL_KEY,bal); 
+  document.getElementById('balance').innerText = bal.toLocaleString('id-ID');
+
+  // tambah history
+  const tx = storage.get(TX_KEY,[]);
+  tx.unshift({
+    id:'TXN'+Date.now(),
+    ts: new Date().toISOString(),
+    type:'pulsa',
+    target: phone,
+    nominal: p.nominal,
+    harga: p.harga,
+    diskon: p.diskon,
+    total: total,
+    status:'Sukses'
+  });
+  storage.set(TX_KEY, tx);
+  renderHistory();
+
+  showPopup('success', `Pembelian ${p.label} ${p.nominal} untuk ${phone} berhasil!\nTotal: ${rupiah(total)}`);
+  document.getElementById('pulsaReset').click();
+});
+
+// CLOSE SHEET BUTTONS
+document.querySelectorAll('.closeSheetBtn, .close-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const sheet = btn.closest('.sheet');
+    closeSheet(sheet);
+  });
+});
+
+// ----------------- POPUP ANIMASI SUKSES -----------------
+function showPopup(type,msg){
+  const overlay = document.createElement('div');
+  Object.assign(overlay.style,{
+    position:'absolute', top:'20px', left:0, right:0,
+    display:'flex', justifyContent:'center', pointerEvents:'none', zIndex:1500
+  });
+
+  const box = document.createElement('div');
+  Object.assign(box.style,{
+    background:type==='success'?'#dcfce7':'#fee2e2',
+    color:type==='success'?'#166534':'#991b1b',
+    padding:'14px 20px',
+    borderRadius:'12px',
+    display:'flex', alignItems:'center',
+    gap:'12px',
+    fontWeight:'600',
+    transform:'scale(0.8)', opacity:0,
+    boxShadow:'0 6px 18px rgba(0,0,0,0.15)',
+    pointerEvents:'auto'
+  });
+
+  const icon = document.createElement('div');
+  if(type==='success'){
+    icon.innerHTML=`<svg class="checkmark" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>`;
+  } else {
+    icon.innerText='❌';
+  }
+
+  const text = document.createElement('div');
+  text.innerText = msg;
+
+  box.appendChild(icon);
+  box.appendChild(text);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+
+  // animasi muncul
+  setTimeout(()=>{ box.style.transform='scale(1)'; box.style.opacity='1'; },50);
+
+  // animasi centang success
+  if(type==='success'){
+    const path = box.querySelector('path');
+    if(path){
+      path.style.strokeDasharray = path.getTotalLength();
+      path.style.strokeDashoffset = path.getTotalLength();
+      path.style.transition = 'stroke-dashoffset 0.5s ease';
+      setTimeout(()=>{ path.style.strokeDashoffset='0'; },100);
+    }
+  }
+
+  // auto hilang
+  setTimeout(()=>{ 
+    box.style.transform='scale(0.8)'; 
+    box.style.opacity='0';
+    setTimeout(()=>overlay.remove(),300);
+  },2000);
+}
+
+    /* ========= Listrik Logic ========= */
+    const plnProducts = [
+      {nominal:'Token 5.000',      harga:5000,     admin:2000, diskon:500},
+  {nominal:'Token 10.000',     harga:10000,    admin:2000, diskon:800},
+  {nominal:'Token 20.000',     harga:20000,    admin:2500, diskon:1000},
+  {nominal:'Token 50.000',     harga:50000,    admin:2500, diskon:2000},
+  {nominal:'Token 100.000',    harga:100000,   admin:2500, diskon:3000},
+  {nominal:'Token 200.000',    harga:200000,   admin:3000, diskon:5000},
+  {nominal:'Token 250.000',    harga:250000,   admin:3000, diskon:6000},
+  {nominal:'Token 300.000',    harga:300000,   admin:3000, diskon:7000},
+  {nominal:'Token 500.000',    harga:500000,   admin:3000, diskon:10000},
+  {nominal:'Token 750.000',    harga:750000,   admin:4000, diskon:15000},
+  {nominal:'Token 1.000.000',  harga:1000000,  admin:5000, diskon:20000},
+  {nominal:'Token 1.500.000',  harga:1500000,  admin:6000, diskon:30000},
+  {nominal:'Token 2.000.000',  harga:2000000,  admin:7000, diskon:40000},
+  {nominal:'Token 5.000.000',  harga:5000000,  admin:10000, diskon:100000}, 
+    ];
+    const plnGrid = document.getElementById('plnGrid');
+let plnSelected = null;
+
+function renderPlnGrid(){
+  plnGrid.innerHTML='';
+  plnProducts.forEach((p,i)=>{
+    const div = document.createElement('div');
+    div.className='price-card';
+    div.innerHTML = `
+      <div class="text-sm font-semibold">Prabayar</div>
+      <div class="text-xs text-gray-600">${p.nominal}</div>
+      <div class="flex items-center justify-between mt-1">
+        <div class="text-sm font-semibold">${rupiah(p.harga + p.admin - p.diskon)}</div>
+        <span class="pill">- ${rupiah(p.diskon)}</span>
+      </div>`;
+    div.addEventListener('click',()=>{
+      plnSelected=i;
+      qsa('#plnGrid .price-card').forEach(x=>x.classList.remove('active'));
+      div.classList.add('active');
+      updatePlnSummary();
+    });
+    plnGrid.appendChild(div);
+  });
+}
+renderPlnGrid();
+
+function fakePlnInquiry(id){
+  const names = ['BUDI','SITI','ANDI','NUR','INTAN','RIZKY'];
+  const dayaList = ['900 VA','1300 VA','2200 VA','3500 VA'];
+  return {
+    nama: names[id.length % names.length] + ' ' + id.slice(-3),
+    daya: dayaList[id.length % dayaList.length]
+  };
+}
+
+document.getElementById('plnId').addEventListener('input', (e)=>{
+  const id = e.target.value.trim();
+  const info = document.getElementById('plnInfo');
+  if(/^[0-9]{10,13}$/.test(id)){
+    const res = fakePlnInquiry(id);
+    document.getElementById('plnNama').innerText = res.nama;
+    document.getElementById('plnDaya').innerText = res.daya;
+    info.classList.remove('hidden');
+  }else{
+    info.classList.add('hidden');
+  }
+});
+
+function updatePlnSummary(){
+  const sum = document.getElementById('plnSummary');
+  if(plnSelected===null){ sum.classList.add('hidden'); return; }
+  const p = plnProducts[plnSelected];
+  const total = p.harga + p.admin - p.diskon;
+  document.getElementById('plnHarga').innerText  = rupiah(p.harga);
+  document.getElementById('plnAdmin').innerText  = rupiah(p.admin);
+  document.getElementById('plnDiskon').innerText = '- ' + rupiah(p.diskon);
+  document.getElementById('plnTotal').innerText  = rupiah(total);
+  sum.classList.remove('hidden');
+}
+
+document.getElementById('plnReset').addEventListener('click', ()=>{
+  plnSelected=null; qsa('#plnGrid .price-card').forEach(x=>x.classList.remove('active'));
+  document.getElementById('plnSummary').classList.add('hidden');
+  document.getElementById('plnId').value=''; 
+  document.getElementById('plnInfo').classList.add('hidden');
+});
+
+document.getElementById('plnBayar').addEventListener('click', ()=>{
+  const idpel = document.getElementById('plnId').value.trim();
+  if(!/^[0-9]{10,13}$/.test(idpel)){ showPopup('error','ID pelanggan / No. meter tidak valid'); return; }
+  if(plnSelected===null){ showPopup('error','Pilih nominal token dahulu'); return; }
+
+  const p = plnProducts[plnSelected];
+  const total = p.harga + p.admin - p.diskon;
+  let bal = storage.get(BAL_KEY,0);
+  if(bal < total){ showPopup('error','Saldo tidak cukup'); return; }
+
+  bal -= total; storage.set(BAL_KEY,bal); 
+  document.getElementById('balance').innerText = bal.toLocaleString('id-ID');
+
+  const inq = fakePlnInquiry(idpel);
+
+  // simpan history
+  const tx = storage.get(TX_KEY,[]);
+  tx.unshift({
+    id:'TXN'+Date.now(),
+    ts: new Date().toISOString(),
+    type:'listrik',
+    target: idpel,
+    nama: inq.nama,
+    daya: inq.daya,
+    nominal: p.nominal,
+    harga: p.harga,
+    admin: p.admin,
+    diskon: p.diskon,
+    total: total,
+    status:'Sukses',
+    token: 'TKN-'+Math.random().toString(36).slice(2,10).toUpperCase()
+  });
+  storage.set(TX_KEY, tx);
+  renderHistory();
+
+  showPopup('success', `Pembelian ${p.nominal} untuk ${idpel} berhasil!\nToken: ${tx[0].token}\nTotal: ${rupiah(total)}`);
+  document.getElementById('plnReset').click();
+});
+
+// CLOSE SHEET BUTTONS
+document.querySelectorAll('.closeSheetBtn, .close-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const sheet = btn.closest('.sheet');
+    closeSheet(sheet);
+  });
+});
+
+// ================== POPUP SUKSES / ERROR ==================
+function showPopup(type, msg){
+  const overlay = document.createElement('div');
+  Object.assign(overlay.style,{
+    position:'absolute', top:'20px', left:0, right:0,
+    display:'flex', justifyContent:'center', pointerEvents:'none', zIndex:1500
+  });
+
+  const box = document.createElement('div');
+  Object.assign(box.style,{
+    background:type==='success'?'#dcfce7':'#fee2e2',
+    color:type==='success'?'#166534':'#991b1b',
+    padding:'14px 20px',
+    borderRadius:'12px',
+    display:'flex', alignItems:'center',
+    gap:'12px',
+    fontWeight:'600',
+    transform:'translateY(-80px) scale(0.8)',
+    opacity:0,
+    boxShadow:'0 6px 18px rgba(0,0,0,0.15)',
+    pointerEvents:'auto',
+    transition:'transform 0.4s ease, opacity 0.4s ease'
+  });
+
+  const icon = document.createElement('div');
+  if(type==='success'){
+    icon.innerHTML=`
+      <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 13l4 4L19 7"/>
+      </svg>`;
+  } else {
+    icon.innerText='❌';
+  }
+
+  const text = document.createElement('div');
+  text.innerText = msg;
+
+  box.appendChild(icon);
+  box.appendChild(text);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+
+  setTimeout(()=>{
+    box.style.transform='translateY(0) scale(1)';
+    box.style.opacity='1';
+  },50);
+
+  if(type==='success'){
+    const path = box.querySelector('path');
+    if(path){
+      const length = path.getTotalLength();
+      path.style.strokeDasharray = length;
+      path.style.strokeDashoffset = length;
+      path.style.transition = 'stroke-dashoffset 0.5s ease';
+      setTimeout(()=>{ path.style.strokeDashoffset='0'; },100);
+    }
+  }
+
+  setTimeout(()=>{
+    box.style.transform='translateY(-40px) scale(0.8)';
+    box.style.opacity='0';
+    setTimeout(()=>overlay.remove(),400);
+  },2000);
+}
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+
+  /* ========= DATA GAME ========= */
+  const gameProducts = [
+    // Free Fire
+    {game:'ff', nominal:'Diamond 50', harga:10000, diskon:1000, label:'Free Fire', icon:'💎'},
+    {game:'ff', nominal:'Diamond 100', harga:20000, diskon:2000, label:'Free Fire', icon:'💎'},
+    {game:'ff', nominal:'Diamond 310', harga:60000, diskon:5000, label:'Free Fire', icon:'💎'},
+    {game:'ff', nominal:'Diamond 520', harga:95000, diskon:8000, label:'Free Fire', icon:'💎'},
+    {game:'ff', nominal:'Diamond 1060', harga:185000, diskon:15000, label:'Free Fire', icon:'💎'},
+    {game:'ff', nominal:'Elite Pass', harga:120000, diskon:10000, label:'Free Fire', icon:'🎫'},
+    {game:'ff', nominal:'Membership Mingguan', harga:25000, diskon:3000, label:'Free Fire', icon:'⭐'},
+    {game:'ff', nominal:'Membership Bulanan', harga:60000, diskon:5000, label:'Free Fire', icon:'⭐'},
+    {game:'ff', nominal:'Special Bundle', harga:150000, diskon:12000, label:'Free Fire', icon:'🎁'},
+    // Mobile Legends
+    {game:'ml', nominal:'Diamond 86', harga:16000, diskon:1500, label:'MLBB', icon:'💎'},
+    {game:'ml', nominal:'Diamond 172', harga:32000, diskon:3000, label:'MLBB', icon:'💎'},
+    {game:'ml', nominal:'Diamond 257', harga:48000, diskon:4000, label:'MLBB', icon:'💎'},
+    {game:'ml', nominal:'Diamond 344', harga:64000, diskon:5500, label:'MLBB', icon:'💎'},
+    {game:'ml', nominal:'Diamond 429', harga:80000, diskon:7000, label:'MLBB', icon:'💎'},
+    {game:'ml', nominal:'Diamond 514', harga:96000, diskon:8500, label:'MLBB', icon:'💎'},
+    {game:'ml', nominal:'Diamond 706', harga:132000, diskon:12000,label:'MLBB', icon:'💎'},
+    {game:'ml', nominal:'Starlight Member', harga:150000, diskon:12000,label:'MLBB', icon:'🌟'},
+    {game:'ml', nominal:'Twilight Pass', harga:200000, diskon:20000,label:'MLBB', icon:'🎟️'},
+    // PUBG
+    {game:'pubg', nominal:'UC 60', harga:12000, diskon:1000, label:'PUBG', icon:'🎯'},
+    {game:'pubg', nominal:'UC 325', harga:65000, diskon:5000, label:'PUBG', icon:'🎯'},
+    {game:'pubg', nominal:'UC 660', harga:125000, diskon:9000, label:'PUBG', icon:'🎯'},
+    {game:'pubg', nominal:'UC 1800', harga:330000, diskon:25000,label:'PUBG', icon:'🎯'},
+    {game:'pubg', nominal:'UC 3850', harga:660000, diskon:50000,label:'PUBG', icon:'🎯'},
+    {game:'pubg', nominal:'UC 8100', harga:1320000, diskon:90000,label:'PUBG', icon:'🎯'},
+    {game:'pubg', nominal:'Elite Pass Plus', harga:200000, diskon:15000,label:'PUBG', icon:'🎟️'},
+    // COD
+    {game:'cod', nominal:'CP 80', harga:15000, diskon:1500, label:'CODM', icon:'💣'},
+    {game:'cod', nominal:'CP 420', harga:75000, diskon:6000, label:'CODM', icon:'💣'},
+    {game:'cod', nominal:'CP 880', harga:155000, diskon:12000,label:'CODM', icon:'💣'},
+    {game:'cod', nominal:'CP 2400', harga:420000, diskon:30000,label:'CODM', icon:'💣'},
+    {game:'cod', nominal:'CP 5000', harga:850000, diskon:60000,label:'CODM', icon:'💣'},
+    {game:'cod', nominal:'CP 10000', harga:1650000, diskon:120000,label:'CODM', icon:'💣'},
+    {game:'cod', nominal:'Battle Pass', harga:170000, diskon:12000,label:'CODM', icon:'🎟️'},
+    // COC
+    {game:'coc', nominal:'Gem 500', harga:50000, diskon:4000, label:'COC', icon:'💎'},
+    {game:'coc', nominal:'Gem 1200', harga:120000, diskon:9000, label:'COC', icon:'💎'},
+    {game:'coc', nominal:'Gem 2500', harga:250000, diskon:20000,label:'COC', icon:'💎'},
+    {game:'coc', nominal:'Gem 6500', harga:650000, diskon:50000,label:'COC', icon:'💎'},
+    {game:'coc', nominal:'Gem 14000', harga:1350000,diskon:100000,label:'COC', icon:'💎'},
+    {game:'coc', nominal:'Gold Pass', harga:75000, diskon:6000, label:'COC', icon:'🎟️'},
+    // Among Us
+    {game:'among', nominal:'Stars 20', harga:10000, diskon:800, label:'Among Us', icon:'⭐'},
+    {game:'among', nominal:'Stars 50', harga:25000, diskon:2000, label:'Among Us', icon:'⭐'},
+    {game:'among', nominal:'Stars 100', harga:48000, diskon:4000, label:'Among Us', icon:'⭐'},
+    {game:'among', nominal:'Stars 250', harga:115000, diskon:9000, label:'Among Us', icon:'⭐'},
+    {game:'among', nominal:'Stars 500', harga:230000, diskon:18000,label:'Among Us', icon:'⭐'},
+    // Roblox
+    {game:'roblox', nominal:'Robux 400', harga:60000, diskon:5000, label:'Roblox', icon:'🟦'},
+    {game:'roblox', nominal:'Robux 800', harga:115000, diskon:9000, label:'Roblox', icon:'🟦'},
+    {game:'roblox', nominal:'Robux 1700', harga:240000, diskon:18000, label:'Roblox', icon:'🟦'},
+    {game:'roblox', nominal:'Robux 4500', harga:630000, diskon:48000, label:'Roblox', icon:'🟦'},
+    {game:'roblox', nominal:'Robux 10000', harga:1350000, diskon:100000, label:'Roblox', icon:'🟦'},
+    {game:'roblox', nominal:'Premium 1 Bulan', harga:120000, diskon:10000,label:'Roblox', icon:'⭐'},
+    {game:'roblox', nominal:'Premium 3 Bulan', harga:350000, diskon:30000,label:'Roblox', icon:'⭐'},
+  ];
+
+  const gameLogos = {
+    ff:     {label: "Free Fire", logo: "https://raw.githubusercontent.com/dfandrn/Gambar/main/Screenshot_2025-09-06-21-02-28-07_680d03679600f7af0b4c700c6b270fe7.jpg"},
+    ml:     {label: "Mobile Legends", logo: "https://raw.githubusercontent.com/dfandrn/danar/main/Screenshot_2025-09-06-16-31-08-05_680d03679600f7af0b4c700c6b270fe7.jpg"},
+    pubg:   {label: "PUBG", logo: "https://raw.githubusercontent.com/dfandrn/Gambar/main/Picsart_25-09-07_09-47-15-149.jpg"},
+    cod:    {label: "Call of Duty", logo: "https://raw.githubusercontent.com/dfandrn/danar/main/Screenshot_2025-09-06-16-29-51-71_680d03679600f7af0b4c700c6b270fe7.jpg"},
+    coc:    {label: "Clash of Clans", logo: "https://raw.githubusercontent.com/dfandrn/danar/main/Screenshot_2025-09-06-16-27-30-40_680d03679600f7af0b4c700c6b270fe7.jpg"},
+    among:  {label: "Among Us", logo: "https://raw.githubusercontent.com/dfandrn/danar/main/Screenshot_2025-09-06-16-28-25-32_680d03679600f7af0b4c700c6b270fe7.jpg"},
+    roblox: {label: "Roblox", logo: "https://raw.githubusercontent.com/dfandrn/danar/main/Screenshot_2025-09-06-16-27-02-38_680d03679600f7af0b4c700c6b270fe7.jpg"}
+  };
+
+  const gameGrid = document.getElementById('gameGrid');
+  const gameSummary = document.getElementById('gameSummary');
+  let gameSelected = null;
+  let selectedGame = null;
+
+  function rupiah(n){ return 'Rp'+n.toLocaleString('id-ID'); }
+  function qsa(sel){ return Array.from(document.querySelectorAll(sel)); }
+
+  // ========== Render Game List ==========
+  function renderGameList(){
+    const list = document.getElementById('gameList');
+    list.innerHTML = '';
+    Object.entries(gameLogos).forEach(([key, g])=>{
+      const card = document.createElement('div');
+      card.className = 'game-card cursor-pointer';
+      card.dataset.game = key;
+      card.innerHTML = `
+        <img src="${g.logo}" alt="${g.label}" 
+             class="w-12 h-12 mx-auto rounded-full object-cover border border-gray-200 shadow-sm">
+        <span class="text-sm font-medium block text-center mt-1">${g.label}</span>`;
+      card.addEventListener('click', ()=>{
+        selectedGame = key;
+        document.getElementById('selectedGame').classList.remove('hidden');
+        document.getElementById('gameLogo').src = g.logo;
+        renderGameGrid(selectedGame);
+      });
+      list.appendChild(card);
+    });
+  }
+
+  // ========== Render Game Grid ==========
+  function renderGameGrid(gameKey){
+    gameGrid.innerHTML = '';
+    gameProducts.filter(p=>p.game===gameKey).forEach(p=>{
+      const div = document.createElement('div');
+      div.className = 'price-card';
+      div.innerHTML = `
+        <div class="text-sm font-semibold flex items-center gap-1">
+          <span>${p.icon}</span> ${p.label}
+        </div>
+        <div class="text-xs text-gray-600">${p.nominal}</div>
+        <div class="flex items-center justify-between mt-1">
+          <div class="text-sm font-semibold">${rupiah(p.harga - p.diskon)}</div>
+          <span class="pill">- ${rupiah(p.diskon)}</span>
+        </div>`;
+      div.addEventListener('click', ()=>{
+        gameSelected = p;
+        qsa('#gameGrid .price-card').forEach(x=>x.classList.remove('active'));
+        div.classList.add('active');
+        updateGameSummary();
+      });
+      gameGrid.appendChild(div);
+    });
+  }
+
+  function updateGameSummary(){
+    if(!gameSelected){ gameSummary.classList.add('hidden'); return; }
+    document.getElementById('gameHarga').innerText  = rupiah(gameSelected.harga);
+    document.getElementById('gameDiskon').innerText = '- ' + rupiah(gameSelected.diskon);
+    document.getElementById('gameTotal').innerText  = rupiah(gameSelected.harga - gameSelected.diskon);
+    gameSummary.classList.remove('hidden');
+  }
+
+  // ========== Buttons ==========
+  document.getElementById('gameReset').addEventListener('click', ()=>{
+    gameSelected=null;
+    qsa('#gameGrid .price-card').forEach(x=>x.classList.remove('active'));
+    gameSummary.classList.add('hidden');
+    document.getElementById('gameUserId').value='';
+  });
+
+  document.getElementById('gameBayar').addEventListener('click', ()=>{
+    const userId = document.getElementById('gameUserId').value.trim();
+    if(userId.length < 3){ showPopup('error','User ID tidak valid'); return; }
+    if(!gameSelected){ showPopup('error','Pilih paket dulu'); return; }
+
+    const total = gameSelected.harga - gameSelected.diskon;
+    let bal = storage.get(BAL_KEY,0);
+    if(bal < total){ showPopup('error','Saldo tidak cukup'); return; }
+
+    bal -= total; 
+    storage.set(BAL_KEY,bal); 
+    document.getElementById('balance').innerText = bal.toLocaleString('id-ID');
+
+    const tx = storage.get(TX_KEY,[]);
+    tx.unshift({
+      id:'TXN'+Date.now(),
+      ts: new Date().toISOString(),
+      type:'game',
+      target: userId,
+      nominal: gameSelected.nominal,
+      label: gameSelected.label,
+      harga: gameSelected.harga,
+      diskon: gameSelected.diskon,
+      total: total,
+      status:'Sukses'
+    });
+    storage.set(TX_KEY, tx);
+    renderHistory();
+
+    showPopup('success', `Top Up ${gameSelected.label} ${gameSelected.nominal} untuk ID ${userId} berhasil!\nTotal: ${rupiah(total)}`);
+    document.getElementById('gameReset').click();
+  });
+
+  // ========== Close Sheet ==========
+  qsa('.closeSheetBtn, .close-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const sheet = btn.closest('.sheet');
+      closeSheet(sheet);
+    });
+  });
+
+  // ========== Init ==========
+  renderGameList();
+
+  // ========== Popup ==========
+  function showPopup(type,msg){
+    const overlay = document.createElement('div');
+    Object.assign(overlay.style,{
+      position:'fixed', top:'20px', left:0, right:0,
+      display:'flex', justifyContent:'center', pointerEvents:'none', zIndex:1500
+    });
+
+    const box = document.createElement('div');
+    Object.assign(box.style,{
+      background:type==='success'?'#dcfce7':'#fee2e2',
+      color:type==='success'?'#166534':'#991b1b',
+      padding:'14px 20px',
+      borderRadius:'20px',
+      display:'flex', alignItems:'center',
+      gap:'12px',
+      fontWeight:'600',
+      transform:'translateY(-80px) scale(0.8)',
+      opacity:0,
+      boxShadow:'0 6px 18px rgba(0,0,0,0.15)',
+      pointerEvents:'auto',
+      transition:'transform 0.4s ease, opacity 0.4s ease'
+    });
+
+    const icon = document.createElement('div');
+    if(type==='success'){
+      icon.innerHTML=`
+        <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 13l4 4L19 7"/>
+        </svg>`;
+    } else { icon.innerText='❌'; }
+
+    const text = document.createElement('div');
+    text.innerText = msg;
+
+    box.appendChild(icon);
+    box.appendChild(text);
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+
+    setTimeout(()=>{ box.style.transform='translateY(0) scale(1)'; box.style.opacity='1'; },50);
+
+    if(type==='success'){
+      const path = box.querySelector('path');
+      if(path){
+        const length = path.getTotalLength();
+        path.style.strokeDasharray = length;
+        path.style.strokeDashoffset = length;
+        path.style.transition = 'stroke-dashoffset 0.5s ease';
+        setTimeout(()=>{ path.style.strokeDashoffset='0'; },100);
+      }
+    }
+
+    setTimeout(()=>{
+      box.style.transform='translateY(-40px) scale(0.8)';
+      box.style.opacity='0';
+      setTimeout(()=>overlay.remove(),400);
+    },2000);
+  }
+
+}); // <-- penutup DOMContentLoaded
+
+/* riwayat trx */
+function renderHistory(){
+  const list = document.getElementById('txnList');
+  const empty = document.getElementById('emptyTxn');
+  const summary = document.getElementById('txnSummary');
+  const txs = storage.get(TX_KEY,[]);
+
+  list.innerHTML = '';
+  summary.innerHTML = '';
+
+  if(!txs.length){ 
+    empty.classList.remove('hidden'); 
+    summary.innerHTML = '';
+    return; 
+  }
+  empty.classList.add('hidden');
+
+  // Hitung total pengeluaran bulan ini
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+
+  const txsThisMonth = txs.filter(tx=>{
+    const d = new Date(tx.ts);
+    return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+  });
+
+  const totalThisMonth = txsThisMonth.reduce((acc,tx)=>acc+tx.total,0);
+  summary.innerHTML = `Bulan ini habis <span class="text-green-600 font-bold">${rupiah(totalThisMonth)}</span> dari ${txsThisMonth.length} transaksi`;
+
+  // Group transaksi berdasarkan tanggal (yyyy-mm-dd)
+  const grouped = {};
+  txs.slice(0,100).forEach(tx=>{
+    const d = new Date(tx.ts);
+    const key = d.toISOString().slice(0,10);
+    if(!grouped[key]) grouped[key] = [];
+    grouped[key].push(tx);
+  });
+
+  // Sort tanggal descending
+  const sortedDates = Object.keys(grouped).sort((a,b)=>b.localeCompare(a));
+
+  sortedDates.forEach(dateStr=>{
+    const dateObj = new Date(dateStr);
+    const isToday = isSameDate(dateObj, now);
+    const yesterday = new Date(now);
+    yesterday.setDate(now.getDate()-1);
+    const isYesterday = isSameDate(dateObj, yesterday);
+
+    let labelDate = '';
+    if(isToday) labelDate = 'Hari ini';
+    else if(isYesterday) labelDate = 'Kemarin';
+    else labelDate = dateObj.toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+    const dateHeader = document.createElement('div');
+    dateHeader.className = 'date-header sticky top-0 bg-white py-2 px-4 font-semibold text-gray-700 border-b border-gray-300';
+    dateHeader.textContent = labelDate;
+    list.appendChild(dateHeader);
+
+    grouped[dateStr].forEach(tx=>{
+      const row = document.createElement('div');
+      row.className='txn-item cursor-pointer p-4 flex items-center justify-between border-b border-gray-100 hover:bg-gray-50 transition';
+
+      const icon = document.createElement('div');
+      icon.className = 'txn-icon flex-shrink-0 mr-4 flex items-center justify-center rounded-full w-12 h-12 bg-gray-100';
+      icon.innerHTML = getIconSVG(tx.type);
+      row.appendChild(icon);
+
+      const left = document.createElement('div');
+      left.className = 'flex-grow';
+      left.innerHTML = `
+        <div class="font-semibold text-gray-900 text-base">${
+          tx.type==='pulsa'   ? 'Pulsa/Data' :
+          tx.type==='listrik' ? 'Listrik' :
+          tx.type==='game'    ? 'Top Up Game' :
+          tx.type==='gplay'   ? 'Google Play Voucher' :
+          'Transaksi'
+        }</div>
+        <div class="text-xs text-gray-500 mt-1">${tx.target}</div>
+        <div class="text-xs text-gray-400 mt-0.5">${tx.nominal}${tx.token ? ' • Token: <span class="font-mono">'+tx.token+'</span>':''}</div>
+      `;
+
+      const right = document.createElement('div');
+      right.className='text-right flex flex-col items-end justify-center min-w-[110px]';
+      right.innerHTML = `
+        <div class="font-semibold text-green-600 text-base">${rupiah(tx.total)}</div>
+        <div class="badge mt-1 px-3 py-0.5 rounded-full text-xs font-semibold ${
+          tx.status.toLowerCase() === 'berhasil' ? 'bg-green-100 text-green-800' :
+          tx.status.toLowerCase() === 'gagal' ? 'bg-red-100 text-red-800' :
+          'bg-yellow-100 text-yellow-800'
+        }">${tx.status}</div>
+      `;
+
+      row.appendChild(left);
+      row.appendChild(right);
+
+      row.addEventListener('click', ()=>showTxnDetail(tx));
+
+      list.appendChild(row);
+    });
+  });
+}
+
+function isSameDate(d1, d2){
+  return d1.getFullYear() === d2.getFullYear() &&
+         d1.getMonth() === d2.getMonth() &&
+         d1.getDate() === d2.getDate();
+}
+
+function showTxnDetail(tx){
+  const modal = document.createElement('div');
+  modal.className = "fixed inset-0 bg-black/60 flex items-center justify-center z-50 backdrop-blur-sm";
+  modal.innerHTML = `
+    <div class="bg-white rounded-3xl shadow-xl max-w-md w-full p-6 relative font-sans">
+      <button class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold" id="closeModal" aria-label="Close modal">×</button>
+      <h2 class="text-2xl font-bold mb-6 text-gray-900">Detail Transaksi</h2>
+      <div class="space-y-4 text-gray-700 text-sm">
+        <div><span class="font-semibold">Jenis:</span> ${
+          tx.type==='pulsa'   ? 'Pulsa/Data' :
+          tx.type==='listrik' ? 'Listrik' :
+          tx.type==='game'    ? 'Top Up Game' :
+          tx.type==='gplay'   ? 'Google Play Voucher' :
+          'Transaksi'
+        }</div>
+        <div><span class="font-semibold">Tanggal:</span> ${new Date(tx.ts).toLocaleString('id-ID')}</div>
+        <div><span class="font-semibold">Nomor/Target:</span> ${tx.target}</div>
+        <div><span class="font-semibold">Nominal:</span> ${tx.nominal}</div>
+        ${tx.token ? `<div><span class="font-semibold">Token:</span> <span class="font-mono bg-gray-100 px-2 py-1 rounded">${tx.token}</span></div>` : ''}
+        <div><span class="font-semibold">Total:</span> <span class="text-green-600 font-bold">${rupiah(tx.total)}</span></div>
+        <div><span class="font-semibold">Status:</span> <span class="badge px-3 py-1 rounded-full text-sm font-semibold ${
+          tx.status.toLowerCase() === 'berhasil' ? 'bg-green-100 text-green-800' :
+          tx.status.toLowerCase() === 'gagal' ? 'bg-red-100 text-red-800' :
+          'bg-yellow-100 text-yellow-800'
+        }">${tx.status}</span></div>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+
+  modal.querySelector('#closeModal').addEventListener('click', ()=>modal.remove());
+  modal.addEventListener('click', e=>{
+    if(e.target===modal) modal.remove();
+  });
+}
+
+
+// Optional: logo trx function to return SVG icons based on tx.type
+function getIconSVG(type){
+  switch(type){
+    // Ganti 'images/namafile.png' dengan lokasi gambar kamu
+    case 'pulsa': return `<img src="------" />`;
+    case 'listrik': return `<img src="https://raw.githubusercontent.com/dfandrn/Gambar/main/logo-listrik-pr.1615298562.jpg" class="w-15 h-15" alt="pulsa" class="w-6 h-6" alt="listrik" />`;
+    case 'game': return `<img src="images/game.png" class="w-6 h-6" alt="game" />`;
+    case 'gplay': return `<img src="images/gplay.png" class="w-6 h-6" alt="gplay" />`;
+    default: return `<img src="images/default.png" class="w-6 h-6" alt="default" />`;
+  }
+}
+
+
+// Helper unik, biar ga bentrok
+const $ = (sel, ctx = document) => ctx.querySelector(sel);
+const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
+
+/* ========= Overlay Elements ========= */
+const overlayPay = $('#overlaySuma');
+const closePay = $('#close');
+
+/* ========= Popup Elements ========= */
+const amountPopup = $('#amountPopup');
+const popupTitle = $('#popupTitle');
+const amountInput = $('#amountInput');
+const confirmBtn = $('#confirmAmount');
+const cancelBtn = $('#cancelAmount');
+
+let selectedMethod = "";
+let selectedAction = "";
+
+/* ========= Buka Overlay ========= */
+function openOverlay(type) {
+  overlayPay.classList.remove('hidden');
+  overlayPay.classList.add('flex');
+  overlayPay.dataset.action = type;
+  selectedAction = type;
+}
+
+/* ========= Tutup Overlay ========= */
+function closeOverlay() {
+  overlayPay.classList.add('hidden');
+  overlayPay.classList.remove('flex');
+}
+closePay.addEventListener('click', closeOverlay);
+
+/* ========= Trigger khusus ========= */
+$('#topUpBtn').addEventListener('click', () => openOverlay('topup'));
+$('#withdrawBtn').addEventListener('click', () => openOverlay('withdraw'));
+
+/* ========= Klik Metode Pembayaran ========= */
+$$('.pay-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    selectedMethod = btn.innerText.trim();
+    showAmountPopup(selectedAction, selectedMethod);
+  });
+});
+
+/* ========= Popup Generator ========= */
+function showAmountPopup(action, method) {
+  // Hapus popup lama kalau ada
+  const existing = document.querySelector('#amount-popup');
+  if (existing) existing.remove();
+
+  // Tambahkan CSS global jika belum ada
+  if (!document.querySelector('#amount-popup-style')) {
+    const style = document.createElement('style');
+    style.id = 'amount-popup-style';
+    style.textContent = `
+      .popup-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.35s ease;
+      }
+      .popup-overlay.active {
+        opacity: 1;
+        visibility: visible;
+      }
+      .popup-box {
+        background: white;
+        border-radius: 20px;
+        width: 300px;
+        max-width: 85%;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        text-align: center;
+        padding: 24px;
+        transform: translateY(60px);
+        transition: transform 0.35s ease;
+        font-family: "Poppins", sans-serif;
+      }
+      .popup-overlay.active .popup-box {
+        transform: translateY(0);
+      }
+      .popup-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 14px;
+      }
+      .popup-icon span {
+        color: white;
+        font-size: 28px;
+      }
+      .popup-title {
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 10px;
+        color: #111827;
+      }
+      .popup-input {
+        width: 100%;
+        border: 1.5px solid #d1d5db;
+        border-radius: 10px;
+        padding: 10px;
+        font-size: 0.95rem;
+        text-align: center;
+        outline: none;
+        margin-bottom: 16px;
+        transition: border 0.2s ease;
+      }
+      .popup-input:focus {
+        border-color: #3b82f6;
+      }
+      .popup-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+      }
+      .popup-btn {
+        flex: 1;
+        padding: 10px 0;
+        border-radius: 10px;
+        border: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: background 0.3s ease;
+      }
+      .popup-cancel {
+        background: #f3f4f6;
+        color: #374151;
+      }
+      .popup-cancel:hover {
+        background: #e5e7eb;
+      }
+      .popup-confirm {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        color: white;
+      }
+      .popup-confirm:hover {
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  // Buat struktur popup
+  const overlay = document.createElement('div');
+  overlay.className = 'popup-overlay';
+  overlay.id = 'amount-popup';
+
+  const box = document.createElement('div');
+  box.className = 'popup-box';
+
+  const icon = document.createElement('div');
+  icon.className = 'popup-icon';
+  icon.innerHTML = '<span>💰</span>';
+
+  const title = document.createElement('div');
+  title.className = 'popup-title';
+  title.textContent = `Masukkan Nominal untuk ${action.toUpperCase()} via ${method}`;
+
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.id = 'amountInput';
+  input.placeholder = 'Masukkan nominal...';
+  input.className = 'popup-input';
+
+  const actions = document.createElement('div');
+  actions.className = 'popup-actions';
+
+  const cancel = document.createElement('button');
+  cancel.className = 'popup-btn popup-cancel';
+  cancel.textContent = 'Batal';
+  cancel.onclick = () => overlay.classList.remove('active');
+
+  const confirm = document.createElement('button');
+  confirm.className = 'popup-btn popup-confirm';
+  confirm.textContent = 'Konfirmasi';
+  confirm.id = 'confirmBtn';
+  confirm.onclick = () => {
+    overlay.classList.remove('active');
+    setTimeout(() => handleConfirm(input.value), 300);
+  };
+
+  actions.append(cancel, confirm);
+  box.append(icon, title, input, actions);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+
+  // Trigger animasi masuk
+  requestAnimationFrame(() => overlay.classList.add('active'));
+}
+
+/* ========= Fungsi Konfirmasi ========= */
+function handleConfirm(nominal) {
+  const n = parseInt(nominal, 10);
+  if (!n) return showModal("Gagal!", "Nominal tidak valid!", "error");
+
+  let bal = storage.get(BAL_KEY, 0);
+  if (selectedAction === "topup") {
+    bal += n;
+    storage.set(BAL_KEY, bal);
+    $('#balance').innerText = bal.toLocaleString('id-ID');
+    showModal("Top Up Berhasil!", `Berhasil via ${selectedMethod}: Rp${n.toLocaleString("id-ID")}`, "success");
+  } else {
+    if (bal < n) return showModal("Gagal!", "Saldo tidak cukup!", "error");
+    bal -= n;
+    storage.set(BAL_KEY, bal);
+    $('#balance').innerText = bal.toLocaleString('id-ID');
+    showModal("Tarik Saldo Berhasil!", `Penarikan via ${selectedMethod}: Rp${n.toLocaleString("id-ID")}`, "success");
+  }
+}
+
+/* ========= Konfirmasi Nominal ========= */
+confirmBtn.addEventListener('click', () => {
+  const n = parseInt(amountInput.value, 10);
+  if (!n) return showModal("Gagal!", "Nominal tidak valid!", "error");
+  
+  let bal = storage.get(BAL_KEY, 0);
+  
+  if (selectedAction === "topup") {
+    bal += n;
+    storage.set(BAL_KEY, bal);
+    $('#balance').innerText = bal.toLocaleString('id-ID');
+    showModal("Top Up Berhasil!", `Berhasil via ${selectedMethod}: ${rupiah(n)}`, "success");
+  } else {
+    if (bal < n) return showModal("Gagal!", "Saldo tidak cukup!", "error");
+    bal -= n;
+    storage.set(BAL_KEY, bal);
+    $('#balance').innerText = bal.toLocaleString('id-ID');
+    showModal("Tarik Saldo Berhasil!", `Penarikan via ${selectedMethod}: ${rupiah(n)}`, "success");
+  }
+});
+
+/* ========= Modal Style Generator ========= */
+if (!document.querySelector('#modal-style')) {
+  const style = document.createElement('style');
+  style.id = 'modal-style';
+  style.textContent = `
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.4s ease;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .modal-box {
+      background: #fff;
+      border-radius: 20px;
+      width: 280px;
+      text-align: center;
+      padding: 24px 20px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+      transform: translateY(60px);
+      transition: transform 0.4s ease;
+    }
+    .modal-overlay.active .modal-box {
+      transform: translateY(0);
+    }
+    .modal-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      margin: 0 auto 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: pop 0.5s ease;
+    }
+    .icon-success { background: #22c55e; }
+    .icon-error { background: #ef4444; }
+    .modal-icon svg {
+      width: 34px;
+      height: 34px;
+      color: white;
+    }
+    @keyframes pop {
+      0% { transform: scale(0.4); opacity: 0; }
+      70% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+    .modal-title {
+      font-family: Poppins, sans-serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #111827;
+    }
+    .modal-msg {
+      color: #6b7280;
+      font-family: Poppins, sans-serif;
+      font-size: 0.9rem;
+      margin-bottom: 16px;
+    }
+    .modal-btn {
+      background: #3b82f6;
+      color: white;
+      font-family: Poppins, sans-serif;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .modal-btn:hover { background: #2563eb; }
+  `;
+  document.head.appendChild(style);
+}
+
+/* ========= Modal Builder ========= */
+function showModal(title, message, type = "success") {
+  const existing = document.querySelector('.modal-overlay');
+  if (existing) existing.remove();
+  
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  
+  const box = document.createElement('div');
+  box.className = 'modal-box';
+  
+  const icon = document.createElement('div');
+  icon.className = `modal-icon icon-${type}`;
+  icon.innerHTML = type === "success" ?
+    `<svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>` :
+    `<svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>`;
+  
+  const titleEl = document.createElement('div');
+  titleEl.className = 'modal-title';
+  titleEl.textContent = title;
+  
+  const msgEl = document.createElement('div');
+  msgEl.className = 'modal-msg';
+  msgEl.textContent = message;
+  
+  const btn = document.createElement('button');
+  btn.className = 'modal-btn';
+  btn.textContent = 'OK';
+  btn.onclick = () => overlay.classList.remove('active');
+  
+  box.append(icon, titleEl, msgEl, btn);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  
+  requestAnimationFrame(() => overlay.classList.add('active'));
+}
+
+
+/* ========= Batal Input ========= */
+cancelBtn.addEventListener('click', () => {
+  amountPopup.classList.add('hidden');
+  amountPopup.classList.remove('flex');
+  amountInput.value = "";
+});
+
+
+
+/*style silent Saldo*/
+const balanceEl = document.getElementById("balance");
+  const toggleBtn = document.getElementById("toggleSaldoBtn");
+  const eyeIcon = document.getElementById("eyeIcon");
+
+  let hidden = false;
+
+  toggleBtn.addEventListener("click", () => {
+    hidden = !hidden;
+    if (hidden) {
+      balanceEl.dataset.real = balanceEl.textContent;
+      balanceEl.textContent = "•••••••";
+      eyeIcon.innerHTML =
+        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.94 17.94A10.94 10.94 0 0 1 12 20C5 20 1 12 1 12a21.8 21.8 0 0 1 5.06-6.94M22.94 12a21.8 21.8 0 0 0-5.06-6.94M14.12 14.12A3 3 0 0 1 9.88 9.88"/>';
+    } else {
+      balanceEl.textContent = balanceEl.dataset.real || "130.500";
+      eyeIcon.innerHTML =
+        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
+    }
+  });
+
+// ===== Utils (khusus saldo) =====
+const SALDO_KEY = "app_saldo_value";
+const saldoStorage = {
+  get: (key, def = 0) => parseInt(localStorage.getItem(key) || def, 10),
+  set: (key, val) => localStorage.setItem(key, val)
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+  const balanceEl = document.getElementById("stickyBalance"); // ⬅️ pakai stickyBalance
+  const refreshBtn = document.getElementById("refreshSaldoBtn");
+  const refreshIcon = document.getElementById("refreshIcon");
+  const loadingSpinner = document.getElementById("loadingSpinner");
+  const refreshText = document.getElementById("refreshText");
+  
+  // === Sinkronisasi awal ===
+  if (!localStorage.getItem(SALDO_KEY)) {
+    const initialBal = parseInt(balanceEl.textContent.replace(/\./g, ''), 10);
+    saldoStorage.set(SALDO_KEY, initialBal);
+  } else {
+    // tampilkan saldo tersimpan saat reload halaman
+    balanceEl.textContent = saldoStorage.get(SALDO_KEY).toLocaleString("id-ID");
+  }
+  
+  // === Tombol refresh saldo ===
+  refreshBtn.addEventListener("click", () => {
+    const currentBal = saldoStorage.get(SALDO_KEY);
+    
+    // aktifkan efek loading
+    refreshIcon.classList.add("opacity-0");
+    loadingSpinner.classList.add("opacity-100");
+    refreshText.textContent = "Memuat...";
+    refreshBtn.classList.add("pointer-events-none");
+    
+    // fade out saldo lama
+    balanceEl.style.transition = "all 0.3s ease";
+    balanceEl.style.opacity = 0;
+    balanceEl.style.transform = "translateY(-10px)";
+    
+    setTimeout(() => {
+      balanceEl.textContent = "Memperbarui...";
+      balanceEl.style.opacity = 1;
+      balanceEl.style.transform = "translateY(0)";
+      
+      let fakeBal = 0;
+      const fakeTarget = Math.floor(Math.random() * 300000) + 900000;
+      const increment = Math.ceil(fakeTarget / 30);
+      
+      const interval = setInterval(() => {
+        fakeBal += increment;
+        if (fakeBal >= fakeTarget) fakeBal = fakeTarget;
+        balanceEl.textContent = fakeBal.toLocaleString("id-ID");
+        
+        if (fakeBal >= fakeTarget) {
+          clearInterval(interval);
+          
+          setTimeout(() => {
+            balanceEl.style.opacity = 0;
+            balanceEl.style.transform = "translateY(-10px)";
+            setTimeout(() => {
+              // Simulasi saldo naik (realistik)
+              const newBal = currentBal + Math.floor(Math.random() * 10000) + 5000;
+              saldoStorage.set(SALDO_KEY, newBal);
+              balanceEl.textContent = newBal.toLocaleString("id-ID");
+              balanceEl.style.opacity = 1;
+              balanceEl.style.transform = "translateY(0)";
+            }, 300);
+          }, 300);
+          
+          // matikan loading + tampilkan notifikasi
+          setTimeout(() => {
+            refreshIcon.classList.remove("opacity-0");
+            loadingSpinner.classList.remove("opacity-100");
+            refreshText.textContent = "Refresh";
+            refreshBtn.classList.remove("pointer-events-none");
+            showNotif("Saldo berhasil diperbarui!");
+          }, 1000);
+        }
+      }, 30);
+    }, 300);
+  });
+});
+
+// ===== Notifikasi kecil =====
+function showNotif(text) {
+  const notif = document.createElement("div");
+  notif.className = "notif-toast";
+  notif.textContent = text;
+  document.body.appendChild(notif);
+  setTimeout(() => notif.classList.add("show"), 10);
+  setTimeout(() => {
+    notif.classList.remove("show");
+    setTimeout(() => notif.remove(), 300);
+  }, 2500);
+}
+
+
+
+
+/*tombol on/of*/
+const btn = document.getElementById("toggleThemeBtn");
+  btn.addEventListener("click", () => {
+    document.body.classList.toggle("dark-mode");
+    btn.textContent = document.body.classList.contains("dark-mode")
+      ? "☀️ Light Mode"
+      : "🌙 Dark Mode";
+  });
+
+document.addEventListener('DOMContentLoaded', () => {
+  const canvas = document.getElementById("carGame");
+  if(!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+  const leftBtn = document.getElementById("leftBtn");
+  const rightBtn = document.getElementById("rightBtn");
+  const redeemBtn = document.getElementById("redeemBtn");
+  const restartBtn = document.getElementById("carRestartBtn");
+  const scoreEl = document.getElementById("score");
+  const coinsEl = document.getElementById("coins");
+  const balanceEl = document.getElementById("balance");
+  const sheet = document.getElementById("davigoPointSheet");
+
+  const CarGame = {
+    car: { x: (canvas.width-40)/2, y: canvas.height-60, width: 40, height: 60, color: "#0b63d6" },
+    obstacles: [],
+    coins: [],
+    score: 0,
+    coinCount: 0,
+    animId: null,
+    obstacleTimer: null,
+    coinTimer: null,
+    obstacleInterval: 1800,
+    coinInterval: 3000,
+    gameOver: false,
+    holdIntervalLeft: null,
+    holdIntervalRight: null,
+
+    reset() {
+      this.obstacles = [];
+      this.coins = [];
+      this.score = 0;
+      this.coinCount = 0;
+      this.gameOver = false;
+      this.car.x = (canvas.width - this.car.width) / 2;
+      updateUI();
+    },
+
+    start() {
+      if(this.animId) return;
+      this.reset();
+      this.obstacleTimer = setInterval(() => this.spawnObstacle(), this.obstacleInterval);
+      this.coinTimer = setInterval(() => this.spawnCoin(), this.coinInterval);
+      const loop = () => this.loop();
+      this.animId = requestAnimationFrame(loop);
+    },
+
+    stop() {
+      if(this.animId) cancelAnimationFrame(this.animId);
+      this.animId = null;
+      if(this.obstacleTimer){ clearInterval(this.obstacleTimer); this.obstacleTimer=null; }
+      if(this.coinTimer){ clearInterval(this.coinTimer); this.coinTimer=null; }
+      if(this.holdIntervalLeft){ clearInterval(this.holdIntervalLeft); this.holdIntervalLeft=null; }
+      if(this.holdIntervalRight){ clearInterval(this.holdIntervalRight); this.holdIntervalRight=null; }
+    },
+
+    spawnObstacle() {
+      const w = 36 + Math.random()*24;
+      const x = Math.random() * (canvas.width - w);
+      this.obstacles.push({ x, y: -80, width: w, height: 50 + Math.random()*40, color: "#ef4444" });
+      if(this.obstacles.length > 20) this.obstacles.shift();
+    },
+
+    spawnCoin() {
+      const x = 12 + Math.random() * (canvas.width - 24);
+      this.coins.push({ x, y: -20, radius: 10, color: "#f59e0b" });
+      if(this.coins.length > 20) this.coins.shift();
+    },
+
+    moveLeft(step=20) { this.car.x = Math.max(6, this.car.x - step); },
+    moveRight(step=20) { this.car.x = Math.min(canvas.width - this.car.width - 6, this.car.x + step); },
+
+    loop() {
+      if(this.gameOver){
+        this.stop();
+        showGameOverPopup(this.score, this.coinCount);
+        return;
+      }
+
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle="#e6eefc";
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+
+      ctx.fillStyle=this.car.color;
+      roundRect(ctx, this.car.x, this.car.y, this.car.width, this.car.height, 6, true, false);
+
+      // obstacles
+      for(let i=this.obstacles.length-1;i>=0;i--){
+        const obs=this.obstacles[i];
+        obs.y += 3 + Math.min(4, this.score/1000);
+        ctx.fillStyle=obs.color;
+        roundRect(ctx, obs.x, obs.y, obs.width, obs.height, 6, true, false);
+        if(this.rectIntersect(this.car, obs)) this.gameOver=true;
+        if(obs.y>canvas.height+100) this.obstacles.splice(i,1);
+      }
+
+      // coins
+      for(let i=this.coins.length-1;i>=0;i--){
+        const c=this.coins[i];
+        c.y += 2.2;
+        ctx.beginPath();
+        ctx.fillStyle=c.color;
+        ctx.arc(c.x, c.y, c.radius,0,Math.PI*2);
+        ctx.fill(); ctx.closePath();
+        if(this.circleRectIntersect(c,this.car)){
+          this.coinCount++;
+          this.coins.splice(i,1);
+          updateUI();
+        }
+        if(c.y>canvas.height+50) this.coins.splice(i,1);
+      }
+
+      this.score++;
+      updateUI();
+      this.animId = requestAnimationFrame(()=>this.loop());
+    },
+
+    rectIntersect(a,b){
+      return a.x<b.x+b.width && a.x+a.width>b.x && a.y<b.y+b.height && a.y+a.height>b.y;
+    },
+
+    circleRectIntersect(circle,rect){
+      const distX=Math.abs(circle.x - rect.x - rect.width/2);
+      const distY=Math.abs(circle.y - rect.y - rect.height/2);
+      if(distX>(rect.width/2 + circle.radius)) return false;
+      if(distY>(rect.height/2 + circle.radius)) return false;
+      if(distX<=(rect.width/2)) return true;
+      if(distY<=(rect.height/2)) return true;
+      const dx=distX-rect.width/2;
+      const dy=distY-rect.height/2;
+      return (dx*dx + dy*dy <= circle.radius*circle.radius);
+    },
+
+    redeemCoins(){
+      if(this.coinCount<=0){ showPopup('Info','Belum punya coin. Kumpulkan dulu!'); return; }
+      const valuePerCoin = 100;
+      const add = this.coinCount*valuePerCoin;
+      this.coinCount=0; updateUI();
+      if(balanceEl){
+        balanceEl.innerText = (parseInt(balanceEl.innerText.replace(/[^0-9]/g,''))+add).toLocaleString('id-ID');
+      }
+      showPopup('Berhasil','Coin dikonversi menjadi saldo Rp'+add.toLocaleString('id-ID'));
+    }
+  };
+
+  function roundRect(ctx,x,y,w,h,r,fill,stroke){
+    if(typeof r==='undefined') r=5;
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+    if(fill) ctx.fill();
+    if(stroke) ctx.stroke();
+  }
+
+  function updateUI(){
+    if(scoreEl) scoreEl.innerText=CarGame.score;
+    if(coinsEl) coinsEl.innerText=CarGame.coinCount;
+  }
+
+  document.addEventListener('keydown',(e)=>{
+    if(e.key==='ArrowLeft'||e.key==='a'||e.key==='A') CarGame.moveLeft();
+    if(e.key==='ArrowRight'||e.key==='d'||e.key==='D') CarGame.moveRight();
+  });
+
+  if(leftBtn){
+    leftBtn.addEventListener('click',()=>CarGame.moveLeft());
+    leftBtn.addEventListener('pointerdown',()=>{ 
+      if(CarGame.holdIntervalLeft) clearInterval(CarGame.holdIntervalLeft);
+      CarGame.holdIntervalLeft=setInterval(()=>CarGame.moveLeft(8),80);
+    });
+    ['pointerup','pointercancel','pointerleave','mouseout'].forEach(ev=>{
+      leftBtn.addEventListener(ev,()=>{ if(CarGame.holdIntervalLeft){ clearInterval(CarGame.holdIntervalLeft); CarGame.holdIntervalLeft=null; }});
+    });
+  }
+
+  if(rightBtn){
+    rightBtn.addEventListener('click',()=>CarGame.moveRight());
+    rightBtn.addEventListener('pointerdown',()=>{ 
+      if(CarGame.holdIntervalRight) clearInterval(CarGame.holdIntervalRight);
+      CarGame.holdIntervalRight=setInterval(()=>CarGame.moveRight(8),80);
+    });
+    ['pointerup','pointercancel','pointerleave','mouseout'].forEach(ev=>{
+      rightBtn.addEventListener(ev,()=>{ if(CarGame.holdIntervalRight){ clearInterval(CarGame.holdIntervalRight); CarGame.holdIntervalRight=null; }});
+    });
+  }
+
+  if(restartBtn) restartBtn.addEventListener('click',()=>{ CarGame.stop(); CarGame.reset(); CarGame.start(); });
+  if(redeemBtn) redeemBtn.addEventListener('click',()=>CarGame.redeemCoins());
+
+  if(sheet){
+    const mo=new MutationObserver((mutations)=>{
+      mutations.forEach(m=>{
+        if(m.attributeName==='class'){
+          if(sheet.classList.contains('open')){
+            setTimeout(()=>CarGame.start(),120);
+          } else {
+            CarGame.stop();
+          }
+        }
+      });
+    });
+    mo.observe(sheet,{attributes:true});
+  } else {
+    CarGame.start();
+  }
+
+  window.addEventListener('beforeunload',()=>{ CarGame.stop(); });
+
+  // ----------------- POPUP FUNCTIONS -----------------
+  function showPopup(title,msg){
+    const overlay=document.createElement('div');
+    Object.assign(overlay.style,{
+      position:'fixed',top:0,left:0,right:0,bottom:0,
+      background:'rgba(0,0,0,0.5)',display:'flex',
+      alignItems:'center',justifyContent:'center',zIndex:2000
+    });
+
+    const box=document.createElement('div');
+    Object.assign(box.style,{
+      background:'#fff',padding:'20px',borderRadius:'12px',
+      maxWidth:'300px',width:'90%',textAlign:'center',boxShadow:'0 8px 24px rgba(0,0,0,0.2)',
+      transform:'scale(0.8)',opacity:0,transition:'all .3s'
+    });
+
+    const h=document.createElement('h3'); h.innerText=title; h.style.color='#0284c7'; h.style.marginBottom='10px';
+    const p=document.createElement('p'); p.innerText=msg; p.style.marginBottom='15px';
+    const btnClose=document.createElement('button'); btnClose.innerText='Tutup';
+    Object.assign(btnClose.style,{padding:'8px 12px',borderRadius:'8px',marginTop:'5px',border:'none',background:'#e5e7eb',cursor:'pointer'});
+    btnClose.onclick=()=>overlay.remove();
+
+    box.appendChild(h); box.appendChild(p); box.appendChild(btnClose);
+    overlay.appendChild(box); document.body.appendChild(overlay);
+    setTimeout(()=>{ box.style.transform='scale(1)'; box.style.opacity='1'; },50);
+  }
+
+  function showGameOverPopup(score,coins){
+    const overlay=document.createElement('div');
+    Object.assign(overlay.style,{
+      position:'fixed',top:0,left:0,right:0,bottom:0,
+      background:'rgba(0,0,0,0.5)',display:'flex',
+      alignItems:'center',justifyContent:'center',zIndex:2000
+    });
+
+    const box=document.createElement('div');
+    Object.assign(box.style,{
+      background:'#fff',padding:'20px',borderRadius:'12px',
+      maxWidth:'300px',width:'90%',textAlign:'center',boxShadow:'0 8px 24px rgba(0,0,0,0.2)',
+      transform:'scale(0.8)',opacity:0,transition:'all .3s'
+    });
+
+    const h=document.createElement('h3'); h.innerText='Game Over!'; h.style.color='#ef4444'; h.style.marginBottom='10px';
+    const p=document.createElement('p'); p.innerHTML=`Skor: ${score} <br>Coin: ${coins}`; p.style.marginBottom='15px';
+
+    const btnRestart=document.createElement('button'); btnRestart.innerText='Restart';
+    Object.assign(btnRestart.style,{padding:'8px 12px',borderRadius:'8px',margin:'5px',border:'none',background:'#0284c7',color:'#fff',cursor:'pointer'});
+    btnRestart.onclick=()=>{ overlay.remove(); CarGame.reset(); CarGame.start(); };
+
+    const btnRedeem=document.createElement('button'); btnRedeem.innerText='Tukar Coin';
+    Object.assign(btnRedeem.style,{padding:'8px 12px',borderRadius:'8px',margin:'5px',border:'none',background:'#f59e0b',color:'#fff',cursor:'pointer'});
+    btnRedeem.onclick=()=>{ CarGame.redeemCoins(); overlay.remove(); };
+
+    box.appendChild(h); box.appendChild(p); box.appendChild(btnRestart); box.appendChild(btnRedeem);
+    overlay.appendChild(box); document.body.appendChild(overlay);
+    setTimeout(()=>{ box.style.transform='scale(1)'; box.style.opacity='1'; },50);
+  }
+
+  // ----------------- Optional Small Notifications -----------------
+  const notifSmallData = [
+    { left: '📣 Beberapa orang 👉 🎁 <strong>DAVIGO Deals</strong> oleh 👩‍👩‍👦', right: '🔥' },
+    { left: '📣 Temanmu baru saja mendapatkan <strong>Voucher Diskon</strong>!', right: '🎉' },
+    { left: '📣 Jangan lewatkan <strong>Promo Cashback</strong> hari ini!', right: '💰' },
+    { left: '📣 Ada <strong>Event Spesial</strong> di aplikasi DANA!', right: '✨' }
+  ];
+
+});
+
+
+
+
+  // Data notifikasi kecil
+  const notifSmallData = [
+    {
+      left: '📣 Beberapa orang 👉 🎁 <strong>DAVIGO Deals</strong> oleh 👩‍👩‍👦',
+      right: '🔥'
+    },
+    {
+      left: '📣 Temanmu baru saja mendapatkan <strong>Voucher Diskon</strong>!',
+      right: '🎉'
+    },
+    {
+      left: '📣 Jangan lewatkan <strong>Promo Cashback</strong> hari ini!',
+      right: '💰'
+    },
+    {
+      left: '📣 Ada <strong>Event Spesial</strong> di aplikasi DANA!',
+      right: '✨'
+    }
+  ];
+
+  // Data chat untuk notif card 1 dan 2
+  const notifCard1Data = [
+    {
+      icon: 'https://placehold.co/36x36/00AEEF/FFFFFF?text=%F0%9F%91%A5',
+      text: '<strong>Temanmu</strong> 👉 🎁 dari 👥',
+      time: '7d'
+    },
+    {
+      icon: 'https://placehold.co/36x36/FF4500/FFFFFF?text=%F0%9F%8E%89',
+      text: '<strong>Event</strong> Spesial: Menangkan hadiah menarik!',
+      time: '1h'
+    },
+    {
+      icon: 'https://placehold.co/36x36/008000/FFFFFF?text=%F0%9F%92%B0',
+      text: '<strong>Promo</strong> Cashback hingga 50%!',
+      time: '30m'
+    }
+  ];
+
+  const notifCard2Data = [
+    {
+      icon: 'https://placehold.co/36x36/0044CC/FFFFFF?text=%F0%9F%9A%9A',
+      text: '<strong>DANA</strong> Bayar STNK praktis via e-Samsat di DANA',
+      time: '9m'
+    },
+    {
+      icon: 'https://placehold.co/36x36/800080/FFFFFF?text=%F0%9F%8E%81',
+      text: '<strong>Voucher</strong> Diskon 20% untuk pengguna baru!',
+      time: '2h'
+    },
+    {
+      icon: 'https://placehold.co/36x36/FFA500/FFFFFF?text=%F0%9F%8E%81',
+      text: '<strong>Event</strong> Terbatas: Klaim hadiahmu sekarang!',
+      time: '45m'
+    }
+  ];
+
+  let notifSmallIndex = 0;
+  let notifCard1Index = 0;
+  let notifCard2Index = 0;
+
+  // Referensi elemen notif kecil
+  const notifSmall = document.getElementById('notifSmall');
+  const leftWrapper = notifSmall.querySelector('.left .notif-text-wrapper');
+  const rightWrapper = notifSmall.querySelector('.right .notif-text-wrapper');
+
+  // Referensi notif card 1
+  const notifCard1 = document.getElementById('notifCard1');
+  const notifCard1Icon = document.getElementById('notifCard1Icon');
+  const notifCard1Text = document.getElementById('notifCard1Text');
+  const notifCard1Time = document.getElementById('notifCard1Time');
+
+  // Referensi notif card 2
+  const notifCard2 = document.getElementById('notifCard2');
+  const notifCard2Icon = document.getElementById('notifCard2Icon');
+  const notifCard2Text = document.getElementById('notifCard2Text');
+  const notifCard2Time = document.getElementById('notifCard2Time');
+
+  // Fungsi animasi slide up keluar
+  function slideUpOut(element) {
+    return new Promise(resolve => {
+      element.classList.add('slide-up-out');
+      element.addEventListener('animationend', function handler() {
+        element.removeEventListener('animationend', handler);
+        element.classList.remove('slide-up-out');
+        resolve();
+      });
+    });
+  }
+
+  // Fungsi animasi slide up masuk
+  function slideUpIn(element) {
+    return new Promise(resolve => {
+      element.classList.add('slide-up-in');
+      element.addEventListener('animationend', function handler() {
+        element.removeEventListener('animationend', handler);
+        element.classList.remove('slide-up-in');
+        resolve();
+      });
+    });
+  }
+
+  // Fungsi update notif kecil
+  async function updateNotifSmall() {
+    notifSmallIndex = (notifSmallIndex + 1) % notifSmallData.length;
+
+    await Promise.all([
+      slideUpOut(leftWrapper),
+      slideUpOut(rightWrapper)
+    ]);
+
+    leftWrapper.innerHTML = notifSmallData[notifSmallIndex].left;
+    leftWrapper.setAttribute('data-text', leftWrapper.textContent);
+    rightWrapper.innerHTML = notifSmallData[notifSmallIndex].right;
+    rightWrapper.setAttribute('data-text', rightWrapper.textContent);
+
+    await Promise.all([
+      slideUpIn(leftWrapper),
+      slideUpIn(rightWrapper)
+    ]);
+  }
+
+  // Fungsi update notif card 1
+  async function updateNotifCard1() {
+    notifCard1Index = (notifCard1Index + 1) % notifCard1Data.length;
+
+    await slideUpOut(notifCard1);
+    notifCard1Icon.src = notifCard1Data[notifCard1Index].icon;
+    notifCard1Text.innerHTML = notifCard1Data[notifCard1Index].text;
+    notifCard1Time.textContent = notifCard1Data[notifCard1Index].time;
+    await slideUpIn(notifCard1);
+  }
+
+  // Fungsi update notif card 2
+  async function updateNotifCard2() {
+    notifCard2Index = (notifCard2Index + 1) % notifCard2Data.length;
+
+    await slideUpOut(notifCard2);
+    notifCard2Icon.src = notifCard2Data[notifCard2Index].icon;
+    notifCard2Text.innerHTML = notifCard2Data[notifCard2Index].text;
+    notifCard2Time.textContent = notifCard2Data[notifCard2Index].time;
+    await slideUpIn(notifCard2);
+  }
+
+  // Set data-text awal supaya glitch animasi jalan
+  leftWrapper.setAttribute('data-text', leftWrapper.textContent);
+  rightWrapper.setAttribute('data-text', rightWrapper.textContent);
+
+  // Interval update
+  setInterval(updateNotifSmall, 5000);
+  setInterval(updateNotifCard1, 7000);
+  setInterval(updateNotifCard2, 9000);
+
+
+// logika promo google play
+  const openBtn = document.getElementById('gplayPromoBtn');
+  const modal = document.getElementById('gplayModal');
+  const closeBtn = document.getElementById('closeModal');
+  const spinner = document.getElementById('loadingSpinner');
+  const modalContent = document.getElementById('modalContent');
+
+  openBtn.addEventListener('click', () => {
+    modal.classList.remove('hidden');
+    spinner.classList.remove('hidden');
+    modalContent.classList.add('hidden');
+
+    // simulasi loading
+    setTimeout(() => {
+      spinner.classList.add('hidden');
+      modalContent.classList.remove('hidden');
+      modalContent.classList.remove('animate-slide-down');
+      modalContent.classList.add('animate-slide-up');
+    }, 4000);
+  });
+
+  function closeModal() {
+    // kasih animasi slide-down
+    modalContent.classList.remove('animate-slide-up');
+    modalContent.classList.add('animate-slide-down');
+
+    // tunggu animasi selesai baru hilangkan modal
+    setTimeout(() => {
+      modal.classList.add('hidden');
+      modalContent.classList.remove('animate-slide-down');
+    }, 300);
+  }
+
+  closeBtn.addEventListener('click', closeModal);
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeModal();
+    }
+  });
+
+(function(){
+  // elemen
+  const tabs = Array.from(document.querySelectorAll('.tab'));
+  const voucherList = document.getElementById('voucherList');
+  const voucherCards = Array.from(document.querySelectorAll('.coupon-card'));
+  const tabLoading = document.getElementById('tabLoading');
+  const openFullBtn = document.getElementById('openVoucherFull');
+  const mainPage = document.getElementById('mainPage');
+  const voucherPage = document.getElementById('voucherPage');
+  const voucherPageContent = document.getElementById('voucherPageContent');
+  const backBtn = document.getElementById('backBtn');
+  const voucherPageTitle = document.getElementById('voucherPageTitle');
+
+  let currentCategory = 'googleplay'; // default awal > Google Play sesuai permintaan
+
+  // helper: set active tab visual
+  function setActiveTabVisual(cat){
+    tabs.forEach(t => {
+      if(t.dataset.category === cat) t.classList.add('active'); else t.classList.remove('active');
+      if(cat==='all' && t.dataset.category==='all') t.classList.add('active');
+    });
+  }
+
+  // helper: show filtered vouchers with loading + animation
+  function showCategory(cat){
+    currentCategory = cat;
+    setActiveTabVisual(cat);
+
+    // show loading
+    tabLoading.classList.add('active');
+    // hide all cards immediately (smooth)
+    voucherCards.forEach(c => {
+      c.classList.remove('show');
+      c.classList.add('hidden');
+    });
+
+    // after loading, reveal matching
+    setTimeout(() => {
+      tabLoading.classList.remove('active');
+      voucherCards.forEach((c, i) => {
+        const catList = c.dataset.category ? c.dataset.category.split(' ') : [];
+        if(cat === 'all' || catList.includes(cat)){
+          // show with small stagger
+          setTimeout(() => {
+            c.classList.remove('hidden');
+            c.classList.add('show');
+          }, i * 60);
+        } else {
+          // keep hidden
+          c.classList.remove('show');
+          c.classList.add('hidden');
+        }
+      });
+    }, 650); // loading durasi
+  }
+
+  // init tab listeners
+  tabs.forEach(t => {
+    t.addEventListener('click', () => {
+      const cat = t.dataset.category || 'all';
+      showCategory(cat);
+    });
+  });
+
+  // Claim button behavior (delegation so clones work too)
+  document.addEventListener('click', (ev) => {
+    const btn = ev.target.closest('.claim-btn');
+    if(!btn) return;
+    // disable + loading
+    btn.classList.add('loading');
+    const originalText = btn.textContent;
+    btn.textContent = '';
+    // simulate request
+    setTimeout(() => {
+      btn.classList.remove('loading');
+      btn.classList.add('disabled');
+      btn.textContent = 'Voucher telah habis';
+      btn.style.background = '#bdbdbd';
+    }, 1700);
+  });
+
+  // Open fullscreen voucher page: clone current filtered vouchers into voucherPageContent
+  openFullBtn.addEventListener('click', () => {
+    // show fullscreen page with small loading then populate with currently-visible vouchers
+    voucherPageContent.innerHTML = '<div style="text-align:center;color:#6b7280;padding:28px 0">Loading voucher...</div>';
+    mainPage.classList.remove('active'); // hide main
+    voucherPage.classList.add('active');
+    voucherPage.setAttribute('aria-hidden','false');
+
+    // show title based on currentCategory
+    voucherPageTitle.textContent = (currentCategory==='all' ? 'Semua Voucher' : currentCategory.charAt(0).toUpperCase() + currentCategory.slice(1));
+
+    setTimeout(()=> {
+      // clear content
+      voucherPageContent.innerHTML = '';
+      // find matching cards from main list and clone them
+      voucherCards.forEach(c => {
+        const catList = c.dataset.category ? c.dataset.category.split(' ') : [];
+        if(currentCategory === 'all' || catList.includes(currentCategory)){
+          const clone = c.cloneNode(true);
+          // remove hidden/show classes to animate in
+          clone.classList.remove('hidden');
+          clone.classList.add('show');
+          voucherPageContent.appendChild(clone);
+        }
+      });
+
+      // if none found, show message
+      if(!voucherPageContent.children.length){
+        voucherPageContent.innerHTML = '<div style="text-align:center;color:#6b7280;padding:28px 0">Tidak ada voucher untuk kategori ini.</div>';
+      }
+    }, 500); // small delay for UX
+  });
+
+  // Back to main
+  backBtn.addEventListener('click', () => {
+    voucherPage.classList.remove('active');
+    voucherPage.setAttribute('aria-hidden','true');
+    mainPage.classList.add('active');
+    // ensure main shows current filtered view
+    showCategory(currentCategory);
+    // scroll to top of main
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+  // initialize default view
+  // mark tab active (try to find matching tab, fallback to 'all)
+  const hasTab = tabs.some(t => t.dataset.category === currentCategory);
+  if(!hasTab) currentCategory = 'all';
+  setTimeout(()=> showCategory(currentCategory), 60);
+})();
+// logika promo googleplay sampe atas sini 
+
+
+// JS: Loading bar menu titik-titik + teks, kecuali tombol Logout & Pay QRIS
+(function() {
+  const OVERLAY_ID = "app-loading-overlay-2025";
+  
+  function ensureOverlay() {
+    let el = document.getElementById(OVERLAY_ID);
+    if (!el) {
+      el = document.createElement("div");
+      el.id = OVERLAY_ID;
+      el.innerHTML = `
+        <div class="content">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <div class="loading-text"></div>
+        </div>
+      `;
+      Object.assign(el.style, {
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "#ffffff",
+        zIndex: "99999",
+        opacity: "0",
+        pointerEvents: "none",
+        transition: "opacity 0.2s ease",
+        flexDirection: "column",
+        textAlign: "center"
+      });
+      
+      const style = document.createElement("style");
+      style.textContent = `
+        #${OVERLAY_ID} .content { display:flex; flex-direction:column; align-items:center; gap:16px; }
+        #${OVERLAY_ID} .dots { display:flex; gap:8px; }
+        #${OVERLAY_ID} .dots span {
+          width:12px; height:12px; background:#3b82f6; border-radius:50%;
+          display:inline-block; animation:app-bounce-2025 0.6s infinite alternate;
+        }
+        #${OVERLAY_ID} .dots span:nth-child(2){animation-delay:0.2s;}
+        #${OVERLAY_ID} .dots span:nth-child(3){animation-delay:0.4s;}
+        @keyframes app-bounce-2025 { from{transform:translateY(0);opacity:0.5;} to{transform:translateY(-8px);opacity:1;} }
+
+        #${OVERLAY_ID} .loading-text {
+          font-size:16px; color:#1e40af; font-weight:500;
+          overflow:hidden; white-space:nowrap; width:0;
+        }
+        @keyframes typing-2025 { from { width: 0; } to { width: 100%; } }
+      `;
+      document.head.appendChild(style);
+      document.body.appendChild(el);
+    }
+    return el;
+  }
+  
+  function show(ms = 1500) {
+    const overlay = ensureOverlay();
+    overlay.style.opacity = "1";
+    overlay.style.pointerEvents = "auto";
+    
+    const text = overlay.querySelector(".loading-text");
+    text.style.borderRight = "none";
+    text.style.width = "0";
+    text.style.animation = "none";
+    text.offsetWidth;
+    text.style.animation = `typing-2025 0.8s steps(${text.textContent.length}) forwards`;
+    
+    window.setTimeout(() => {
+      overlay.style.opacity = "0";
+      overlay.style.pointerEvents = "none";
+    }, ms);
+  }
+  
+  window.appShowLoading = show;
+  
+  // Klik tombol bottom-nav
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".bottom-nav button");
+    if (!btn) return;
+    
+    // Abaikan tombol Logout & Pay
+    if (btn.id === "tabLogout" || btn.id === "tabPay") return;
+    
+    show(1500);
+  });
+})();
+
+
+
+  
+// ========== Storage Helper (Memory Storage untuk Iframe) ==========
+let gofoodMemory = {};
+const gofoodStorage = {
+  get(k, def) { 
+    try { 
+      const v = gofoodMemory[k]; 
+      return v === null || v === undefined ? def : v; 
+    } catch(e) { 
+      return def; 
+    } 
+  },
+  set(k, v) { 
+    gofoodMemory[k] = v; 
+  },
+  del(k) { 
+    delete gofoodMemory[k]; 
+  }
+};
+
+// ==================== CAROUSEL LOGIC ====================
+let currentSlide = 0;
+const totalSlides = 3;
+
+function createCarouselIndicators() {
+  const indicators = document.getElementById('carousel-indicators');
+  indicators.innerHTML = '';
+  
+  for (let i = 0; i < totalSlides; i++) {
+    const dot = document.createElement('div');
+    dot.className = `carousel-dot ${i === 0 ? 'active' : ''}`;
+    dot.addEventListener('click', () => goToSlide(i));
+    indicators.appendChild(dot);
+  }
+}
+
+function updateCarouselIndicators() {
+  const dots = document.querySelectorAll('.carousel-dot');
+  dots.forEach((dot, index) => {
+    dot.classList.toggle('active', index === currentSlide);
+  });
+}
+
+function goToSlide(slideIndex) {
+  currentSlide = slideIndex;
+  const carousel = document.getElementById('promo-carousel');
+  carousel.style.transform = `translateX(-${currentSlide * 100}%)`;
+  updateCarouselIndicators();
+}
+
+function nextSlide() {
+  currentSlide = (currentSlide + 1) % totalSlides;
+  goToSlide(currentSlide);
+}
+
+function startCarousel() {
+  createCarouselIndicators();
+  setInterval(nextSlide, 4000);
+}
+
+// ==================== ELEMENTS ====================
+const gfBtn = document.getElementById("gf-btn");
+const gfLoading = document.getElementById("gf-loading");
+const gfLayout = document.getElementById("gf-layout");
+const gfClose = document.getElementById("gf-close");
+const menuList = document.getElementById("menu-list");
+const searchInput = document.getElementById("search-menu");
+const searchWrapper = document.getElementById("search-wrapper");
+const categoryBar = document.getElementById("category-bar");
+const cartLayout = document.getElementById("cart-layout");
+const cartList = document.getElementById("cart-list");
+const cartTotalEl = document.getElementById("cart-total");
+
+const aktivitasBtn = document.getElementById("aktivitas-btn");
+const aktivitasLayout = document.getElementById("aktivitas-layout");
+const aktivitasClose = document.getElementById("aktivitas-close");
+const txList = document.getElementById("tx-list");
+
+const txDetailLayout = document.getElementById("tx-detail-layout");
+const txDetailList = document.getElementById("tx-detail-list");
+const txDetailClose = document.getElementById("tx-detail-close");
+
+let cart = [];
+const TX2_KEY = "tx2_history";
+
+// ==================== DATA ====================
+const menus = [
+  // BUBUR AYAM CATEGORY
+  { name:"Bubur Ayam Spesial", desc:"Bubur dengan topping ayam, cakwe, dan telur.", price:15000, img:"https://source.unsplash.com/300x200/?porridge", category:"Bubur Ayam", discount:0, time:"20-30min", rating:4.5 },
+  { name:"Bubur Ayam Biasa", desc:"Bubur dengan topping ayam, free kerupuk.", price:12000, img:"https://source.unsplash.com/300x200/?rice-porridge", category:"Bubur Ayam", discount:0, time:"20-30min", rating:4.3 },
+  { name:"Bubur Ayam Jakarta", desc:"Bubur khas Jakarta dengan suwiran ayam dan kerupuk.", price:16000, img:"https://source.unsplash.com/300x200/?chicken-porridge", category:"Bubur Ayam", discount:15, time:"20-30min", rating:4.4 },
+  { name:"Bubur Ayam Kampung", desc:"Bubur ayam dengan rasa tradisional kampung.", price:14000, img:"https://source.unsplash.com/300x200/?traditional-porridge", category:"Bubur Ayam", discount:0, time:"25-35min", rating:4.2 },
+  { name:"Bubur Ayam Cakwe", desc:"Bubur ayam dengan cakwe crispy dan telur.", price:17000, img:"https://source.unsplash.com/300x200/?porridge-egg", category:"Bubur Ayam", discount:10, time:"20-30min", rating:4.6 },
+
+  // MIE AYAM CATEGORY
+  { name:"Mie Ayam Bakso", desc:"Mie ayam lengkap dengan bakso kenyal.", price:20000, img:"https://source.unsplash.com/300x200/?noodles", category:"Mie Ayam", discount:0, time:"15-25min", rating:4.3 },
+  { name:"Mie Ayam Pangsit", desc:"Mie ayam dengan pangsit goreng dan rebus.", price:22000, img:"https://source.unsplash.com/300x200/?chicken-noodles", category:"Mie Ayam", discount:0, time:"20-30min", rating:4.5 },
+  { name:"Mie Ayam Ceker", desc:"Mie ayam dengan ceker yang empuk dan gurih.", price:18000, img:"https://source.unsplash.com/300x200/?noodle-soup", category:"Mie Ayam", discount:0, time:"25-35min", rating:4.1 },
+  { name:"Mie Ayam Jamur", desc:"Mie ayam dengan jamur segar dan sayuran.", price:19000, img:"https://source.unsplash.com/300x200/?mushroom-noodles", category:"Mie Ayam", discount:20, time:"20-30min", rating:4.4 },
+  { name:"Mie Ayam Spesial", desc:"Mie ayam lengkap dengan semua topping.", price:25000, img:"https://source.unsplash.com/300x200/?special-noodles", category:"Mie Ayam", discount:0, time:"20-30min", rating:4.7 },
+  { name:"Mie Ayam Yamin", desc:"Mie kering dengan ayam dan sayuran segar.", price:21000, img:"https://source.unsplash.com/300x200/?dry-noodles", category:"Mie Ayam", discount:15, time:"15-25min", rating:4.3 },
+
+  // NASI GORENG CATEGORY  
+  { name:"Nasi Goreng Spesial", desc:"Nasi goreng dengan ayam, sosis, dan telur.", price:22000, img:"https://source.unsplash.com/300x200/?fried-rice", category:"Nasi Goreng", discount:20, time:"25-35min", rating:4.6 },
+  { name:"Nasi Goreng Seafood", desc:"Nasi goreng dengan udang, cumi, dan kerang.", price:28000, img:"https://source.unsplash.com/300x200/?seafood-rice", category:"Nasi Goreng", discount:0, time:"30-40min", rating:4.5 },
+  { name:"Nasi Goreng Kampung", desc:"Nasi goreng pedas dengan ikan asin dan pete.", price:20000, img:"https://source.unsplash.com/300x200/?village-fried-rice", category:"Nasi Goreng", discount:10, time:"20-30min", rating:4.4 },
+  { name:"Nasi Goreng Jawa", desc:"Nasi goreng manis khas Jawa dengan kecap.", price:19000, img:"https://source.unsplash.com/300x200/?javanese-rice", category:"Nasi Goreng", discount:0, time:"25-35min", rating:4.2 },
+  { name:"Nasi Goreng Ayam", desc:"Nasi goreng dengan potongan ayam yang banyak.", price:21000, img:"https://source.unsplash.com/300x200/?chicken-fried-rice", category:"Nasi Goreng", discount:15, time:"20-30min", rating:4.3 },
+  { name:"Nasi Goreng Gila", desc:"Nasi goreng pedas dengan level kepedasan tinggi.", price:23000, img:"https://source.unsplash.com/300x200/?spicy-fried-rice", category:"Nasi Goreng", discount:0, time:"25-35min", rating:4.6 },
+
+  // SUSHI CATEGORY
+  { name:"Sushi Salmon", desc:"Sushi segar dengan topping salmon premium.", price:30000, img:"https://source.unsplash.com/300x200/?sushi", category:"Sushi", discount:0, time:"20-30min", rating:4.5 },
+  { name:"Sushi Tuna", desc:"Sushi dengan tuna segar berkualitas tinggi.", price:32000, img:"https://source.unsplash.com/300x200/?tuna-sushi", category:"Sushi", discount:0, time:"20-30min", rating:4.6 },
+  { name:"Sushi California Roll", desc:"California roll dengan alpukat dan kepiting.", price:28000, img:"https://source.unsplash.com/300x200/?california-roll", category:"Sushi", discount:15, time:"15-25min", rating:4.4 },
+  { name:"Sushi Combo", desc:"Paket sushi beragam dengan 12 pieces.", price:45000, img:"https://source.unsplash.com/300x200/?sushi-combo", category:"Sushi", discount:20, time:"25-35min", rating:4.7 },
+  { name:"Sushi Ebi Tempura", desc:"Sushi dengan udang tempura yang crispy.", price:35000, img:"https://source.unsplash.com/300x200/?tempura-sushi", category:"Sushi", discount:0, time:"20-30min", rating:4.5 },
+
+  // MINUMAN CATEGORY
+  { name:"Es Teh Manis", desc:"Minuman segar pelepas dahaga.", price:5000, img:"https://pfst.cf2.poecdn.net/base/image/3d806838cff2a7260d080f59a5c26ee9235b84fea4559800046f6cc67e20af1a?w=4096&h=3803", category:"Minuman", discount:25, time:"5-10min", rating:4.2 },
+  { name:"Es Jeruk Segar", desc:"Jeruk peras segar dengan es batu.", price:8000, img:"https://source.unsplash.com/300x200/?orange-juice", category:"Minuman", discount:0, time:"5-10min", rating:4.3 },
+  { name:"Es Campur", desc:"Es campur dengan berbagai topping manis.", price:12000, img:"https://source.unsplash.com/300x200/?mixed-ice", category:"Minuman", discount:10, time:"10-15min", rating:4.4 },
+  { name:"Jus Alpukat", desc:"Jus alpukat creamy dengan susu kental manis.", price:10000, img:"https://source.unsplash.com/300x200/?avocado-juice", category:"Minuman", discount:0, time:"5-10min", rating:4.5 },
+  { name:"Es Kelapa Muda", desc:"Air kelapa muda segar langsung dari buah.", price:9000, img:"https://source.unsplash.com/300x200/?coconut-water", category:"Minuman", discount:15, time:"5-10min", rating:4.1 },
+  { name:"Kopi Hitam", desc:"Kopi hitam pekat untuk yang suka pahit.", price:7000, img:"https://source.unsplash.com/300x200/?black-coffee", category:"Minuman", discount:0, time:"5-10min", rating:4.0 },
+  { name:"Kopi Susu", desc:"Kopi dengan campuran susu yang creamy.", price:10000, img:"https://source.unsplash.com/300x200/?milk-coffee", category:"Minuman", discount:0, time:"5-10min", rating:4.4 },
+  { name:"Teh Tarik", desc:"Teh susu yang ditarik dengan teknik khusus.", price:8000, img:"https://source.unsplash.com/300x200/?pulled-tea", category:"Minuman", discount:0, time:"10-15min", rating:4.3 },
+
+  // SATE CATEGORY
+  { name:"Sate Ayam Madura", desc:"Sate ayam dengan bumbu kacang khas Madura.", price:25000, img:"https://source.unsplash.com/300x200/?satay", category:"Sate", discount:0, time:"30-40min", rating:4.7 },
+  { name:"Sate Kambing", desc:"Sate kambing empuk dengan bumbu kacang pedas.", price:30000, img:"https://source.unsplash.com/300x200/?goat-satay", category:"Sate", discount:0, time:"35-45min", rating:4.6 },
+  { name:"Sate Padang", desc:"Sate dengan kuah gulai khas Padang.", price:28000, img:"https://source.unsplash.com/300x200/?padang-satay", category:"Sate", discount:10, time:"30-40min", rating:4.5 },
+  { name:"Sate Lilit Bali", desc:"Sate lilit ikan khas Bali yang harum.", price:26000, img:"https://source.unsplash.com/300x200/?balinese-satay", category:"Sate", discount:0, time:"25-35min", rating:4.4 },
+
+  // GADO-GADO CATEGORY
+  { name:"Gado-Gado Jakarta", desc:"Salad Indonesia dengan bumbu kacang.", price:18000, img:"https://source.unsplash.com/300x200/?gado-gado", category:"Gado-Gado", discount:0, time:"15-25min", rating:4.3 },
+  { name:"Gado-Gado Betawi", desc:"Gado-gado khas Betawi dengan lontong.", price:20000, img:"https://source.unsplash.com/300x200/?betawi-salad", category:"Gado-Gado", discount:15, time:"15-25min", rating:4.5 },
+  { name:"Pecel Madiun", desc:"Pecel sayuran dengan sambal pecel pedas.", price:16000, img:"https://source.unsplash.com/300x200/?pecel", category:"Gado-Gado", discount:0, time:"15-25min", rating:4.2 },
+
+  // SOTO CATEGORY
+  { name:"Soto Ayam", desc:"Sup ayam bening dengan suwiran ayam dan tauge.", price:17000, img:"https://source.unsplash.com/300x200/?chicken-soup", category:"Soto", discount:0, time:"20-30min", rating:4.4 },
+  { name:"Soto Betawi", desc:"Soto khas Betawi dengan santan dan kentang.", price:19000, img:"https://source.unsplash.com/300x200/?betawi-soup", category:"Soto", discount:0, time:"25-35min", rating:4.5 },
+  { name:"Soto Kudus", desc:"Soto dengan kuah bening dan kerupuk karak.", price:18000, img:"https://source.unsplash.com/300x200/?kudus-soup", category:"Soto", discount:10, time:"20-30min", rating:4.3 },
+  { name:"Coto Makassar", desc:"Sup daging khas Makassar yang kaya rempah.", price:22000, img:"https://source.unsplash.com/300x200/?makassar-soup", category:"Soto", discount:0, time:"30-40min", rating:4.6 },
+
+  // BAKSO CATEGORY
+  { name:"Bakso Malang", desc:"Bakso khas Malang dengan berbagai varian.", price:16000, img:"https://source.unsplash.com/300x200/?meatball", category:"Bakso", discount:0, time:"20-30min", rating:4.4 },
+  { name:"Bakso Urat", desc:"Bakso dengan urat yang kenyal dan gurih.", price:18000, img:"https://source.unsplash.com/300x200/?tendon-meatball", category:"Bakso", discount:0, time:"20-30min", rating:4.3 },
+  { name:"Bakso Keju", desc:"Bakso dengan isian keju mozzarella.", price:20000, img:"https://source.unsplash.com/300x200/?cheese-meatball", category:"Bakso", discount:15, time:"20-30min", rating:4.5 },
+  { name:"Bakso Jumbo", desc:"Bakso berukuran jumbo dengan isian telur.", price:22000, img:"https://source.unsplash.com/300x200/?jumbo-meatball", category:"Bakso", discount:0, time:"25-35min", rating:4.6 },
+
+  // AYAM CATEGORY
+  { name:"Ayam Bakar Taliwang", desc:"Ayam bakar pedas khas Lombok yang menggugah selera.", price:25000, img:"https://source.unsplash.com/300x200/?grilled-chicken", category:"Ayam", discount:0, time:"30-40min", rating:4.6 },
+  { name:"Ayam Geprek", desc:"Ayam crispy yang digeprek dengan sambal pedas.", price:20000, img:"https://source.unsplash.com/300x200/?smashed-chicken", category:"Ayam", discount:10, time:"20-30min", rating:4.5 },
+  { name:"Ayam Kremes", desc:"Ayam goreng dengan kremesan yang crispy.", price:23000, img:"https://source.unsplash.com/300x200/?crispy-chicken", category:"Ayam", discount:0, time:"25-35min", rating:4.4 },
+  { name:"Ayam Penyet", desc:"Ayam goreng yang dipenyet dengan sambal terasi.", price:21000, img:"https://source.unsplash.com/300x200/?penyet-chicken", category:"Ayam", discount:15, time:"20-30min", rating:4.3 },
+
+  // SEAFOOD CATEGORY
+  { name:"Udang Saus Padang", desc:"Udang dengan saus pedas khas Padang.", price:35000, img:"https://source.unsplash.com/300x200/?shrimp-sauce", category:"Seafood", discount:0, time:"25-35min", rating:4.5 },
+  { name:"Ikan Bakar Jimbaran", desc:"Ikan bakar dengan bumbu khas Jimbaran Bali.", price:32000, img:"https://source.unsplash.com/300x200/?grilled-fish", category:"Seafood", discount:0, time:"30-40min", rating:4.6 },
+  { name:"Cumi Saus Tiram", desc:"Cumi-cumi dengan saus tiram yang gurih.", price:28000, img:"https://source.unsplash.com/300x200/?squid-oyster", category:"Seafood", discount:10, time:"20-30min", rating:4.4 },
+  { name:"Kepiting Saus Padang", desc:"Kepiting dengan saus pedas yang menggoda.", price:45000, img:"https://source.unsplash.com/300x200/?crab-sauce", category:"Seafood", discount:0, time:"35-45min", rating:4.7 },
+
+  // CEMILAN CATEGORY
+  { name:"Pisang Goreng", desc:"Cemilan manis renyah di luar, lembut di dalam.", price:10000, img:"https://source.unsplash.com/300x200/?banana-fritters", category:"Cemilan", discount:10, time:"10-15min", rating:4.4 },
+  { name:"Tahu Isi", desc:"Tahu goreng dengan isian sayuran segar.", price:8000, img:"https://source.unsplash.com/300x200/?stuffed-tofu", category:"Cemilan", discount:0, time:"10-15min", rating:4.2 },
+  { name:"Risoles Mayo", desc:"Risoles crispy dengan isian sayuran dan mayo.", price:12000, img:"https://source.unsplash.com/300x200/?risoles", category:"Cemilan", discount:15, time:"15-20min", rating:4.3 },
+  { name:"Siomay Bandung", desc:"Siomay dengan bumbu kacang khas Bandung.", price:15000, img:"https://source.unsplash.com/300x200/?siomay", category:"Cemilan", discount:0, time:"15-25min", rating:4.5 },
+  { name:"Kerupuk Udang", desc:"Kerupuk udang crispy untuk pelengkap.", price:5000, img:"https://source.unsplash.com/300x200/?shrimp-crackers", category:"Cemilan", discount:20, time:"5-10min", rating:4.1 },
+  { name:"Martabak Mini", desc:"Martabak ukuran mini dengan berbagai rasa.", price:18000, img:"https://source.unsplash.com/300x200/?mini-martabak", category:"Cemilan", discount:0, time:"20-30min", rating:4.6 },
+
+  // DESSERT CATEGORY
+  { name:"Es Krim Vanilla", desc:"Es krim vanilla premium yang creamy.", price:15000, img:"https://source.unsplash.com/300x200/?vanilla-ice-cream", category:"Dessert", discount:0, time:"5-10min", rating:4.3 },
+  { name:"Pudding Coklat", desc:"Pudding coklat lembut dengan topping krim.", price:12000, img:"https://source.unsplash.com/300x200/?chocolate-pudding", category:"Dessert", discount:10, time:"10-15min", rating:4.4 },
+  { name:"Klepon", desc:"Kue tradisional dengan isian gula merah.", price:8000, img:"https://source.unsplash.com/300x200/?klepon", category:"Dessert", discount:0, time:"15-20min", rating:4.2 },
+  { name:"Cendol Dawet", desc:"Minuman tradisional dengan santan dan gula merah.", price:10000, img:"https://source.unsplash.com/300x200/?cendol", category:"Dessert", discount:15, time:"10-15min", rating:4.5 },
+
+  // PIZZA CATEGORY
+  { name:"Pizza Margherita", desc:"Pizza klasik dengan keju mozzarella dan basil.", price:45000, img:"https://source.unsplash.com/300x200/?margherita-pizza", category:"Pizza", discount:0, time:"25-35min", rating:4.5 },
+  { name:"Pizza Pepperoni", desc:"Pizza dengan topping pepperoni yang gurih.", price:50000, img:"https://source.unsplash.com/300x200/?pepperoni-pizza", category:"Pizza", discount:20, time:"25-35min", rating:4.6 },
+  { name:"Pizza Hawaiian", desc:"Pizza dengan nanas dan ham yang unik.", price:48000, img:"https://source.unsplash.com/300x200/?hawaiian-pizza", category:"Pizza", discount:0, time:"30-40min", rating:4.3 },
+
+  // BURGER CATEGORY
+  { name:"Burger Beef", desc:"Burger dengan daging sapi juicy dan saus spesial.", price:25000, img:"https://source.unsplash.com/300x200/?beef-burger", category:"Burger", discount:0, time:"15-25min", rating:4.4 },
+  { name:"Burger Chicken", desc:"Burger dengan ayam crispy dan sayuran segar.", price:22000, img:"https://source.unsplash.com/300x200/?chicken-burger", category:"Burger", discount:15, time:"15-25min", rating:4.3 },
+  { name:"Burger Double Cheese", desc:"Burger dengan double keju yang melted.", price:28000, img:"https://source.unsplash.com/300x200/?cheese-burger", category:"Burger", discount:0, time:"20-30min", rating:4.5 }
+];
+
+const categories = ["Semua", ...new Set(menus.map(m=>m.category))];
+
+const categoryImages = {
+  "Semua": "https://pfst.cf2.poecdn.net/base/image/b3be979177b45539ee7953df52aec625559ddedd32eea027992a07ef14c30cb8?w=500&h=500",
+  "Bubur Ayam": "https://pfst.cf2.poecdn.net/base/image/a2a0e424819cc0f5bbac502d783ebe0cef6043647bc92faafb97204d55730bb0?w=534&h=468",
+  "Mie Ayam": "https://pfst.cf2.poecdn.net/base/image/e8e346a1d2acea15e628463bee9c911ab10c7c52b99d021298a20ea8c4ab6b25?w=500&h=500",
+  "Nasi Goreng": "https://pfst.cf2.poecdn.net/base/image/9b0927f25fd5c895ce5672a2cee7b42a087cdeca77fac687dbd8ac0ec86212c4?w=638&h=391",
+  "Sushi": "https://pfst.cf2.poecdn.net/base/image/45012fcf3342ee6176f35110eede28b1dc71340af4ffe25ba0facaeb46928da3?w=551&h=453",
+  "Minuman": "https://pfst.cf2.poecdn.net/base/image/3d806838cff2a7260d080f59a5c26ee9235b84fea4559800046f6cc67e20af1a?w=4096&h=3803",
+  "Sate": "https://source.unsplash.com/80x80/?satay",
+  "Gado-Gado": "https://source.unsplash.com/80x80/?gado-gado",
+  "Soto": "https://source.unsplash.com/80x80/?soup",
+  "Bakso": "https://source.unsplash.com/80x80/?meatball",
+  "Ayam": "https://source.unsplash.com/80x80/?chicken",
+  "Seafood": "https://source.unsplash.com/80x80/?seafood",
+  "Cemilan": "https://source.unsplash.com/80x80/?snack",
+  "Dessert": "https://source.unsplash.com/80x80/?dessert",
+  "Pizza": "https://source.unsplash.com/80x80/?pizza",
+  "Burger": "https://source.unsplash.com/80x80/?burger"
+};
+
+// ==================== FUNGSI TAMBAHAN ====================
+function showPaymentSuccessPopup(transaction) {
+  // Tampilkan loading dulu
+  const loadingModal = document.createElement('div');
+  loadingModal.className = 'fixed inset-0 bg-black/40 flex items-center justify-center z-[10001] p-3';
+  
+  loadingModal.innerHTML = `
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-8 text-center animate-zoomIn">
+            <div class="w-12 h-12 border-4 border-green-200 border-t-green-500 rounded-full animate-spin mx-auto mb-4"></div>
+            <p class="text-gray-600 dark:text-gray-400 text-sm">Memproses pembayaran...</p>
+        </div>
+    `;
+  
+  document.body.appendChild(loadingModal);
+  
+  // Setelah 1.5 detik, ganti dengan card success
+  setTimeout(() => {
+    loadingModal.remove();
+    
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black/40 flex items-center justify-center z-[10001] p-3';
+    
+    modal.innerHTML = `
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-[92%] max-w-sm overflow-hidden animate-zoomIn">
+                
+                <!-- Header -->
+                <div class="bg-green-500 text-white p-4 text-center relative">
+                    <div class="absolute top-2 right-2">
+                        <button onclick="this.closest('.fixed').remove()" class="text-white/80 hover:text-white">
+                            ✕
+                        </button>
+                    </div>
+                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" 
+                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 
+                                     1 0 01-1.414 0l-4-4a1 1 0 
+                                     011.414-1.414L8 12.586l7.293-7.293a1 
+                                     1 0 011.414 0z" 
+                                  clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <h2 class="text-lg font-bold">Pembayaran Berhasil!</h2>
+                    <p class="text-green-100 text-sm">Pesanan sedang diproses</p>
+                </div>
+                
+                <!-- Body -->
+                <div class="p-4 space-y-3 text-sm">
+                    
+                    <!-- Info utama -->
+                    <div class="flex justify-between">
+                        <span class="text-gray-600 dark:text-gray-400">ID</span>
+                        <span class="font-mono text-gray-900 dark:text-gray-200">#${transaction.id.toUpperCase()}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600 dark:text-gray-400">Total</span>
+                        <span class="font-bold text-green-600">Rp ${transaction.total.toLocaleString('id-ID')}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600 dark:text-gray-400">Status</span>
+                        <span class="px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded-full text-xs">${transaction.status}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600 dark:text-gray-400">Estimasi</span>
+                        <span class="text-gray-900 dark:text-gray-200">20-30 mnt</span>
+                    </div>
+                    
+                    <!-- Ringkasan -->
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+                        <h3 class="font-medium text-gray-900 dark:text-gray-200 mb-2 text-sm">Ringkasan</h3>
+                        
+                        <!-- Scroll container -->
+                        <div class="max-h-40 overflow-y-auto pr-1 space-y-2">
+                            ${transaction.menus.map(item => `
+                                <div class="flex items-center justify-between">
+                                    <!-- Foto menu -->
+                                    <img src="${item.img}" alt="${item.name}" 
+                                         class="w-10 h-10 rounded-md object-cover mr-2 border border-gray-200 dark:border-gray-600">
+                                    
+                                    <!-- Nama & Qty -->
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-gray-800 dark:text-gray-200 text-sm truncate">${item.name}</p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">x${item.qty}</p>
+                                    </div>
+                                    
+                                    <!-- Harga -->
+                                    <div class="text-gray-900 dark:text-gray-200 text-sm font-medium whitespace-nowrap ml-2">
+                                        Rp ${(item.price * item.qty).toLocaleString('id-ID')}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <!-- Kontak -->
+                    <div class="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-3">
+                        <div class="flex items-center text-blue-700 dark:text-blue-300 text-xs mb-1">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 
+                                         1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 
+                                         006.105 6.105l.774-1.548a1 1 0 
+                                         011.059-.54l4.435.74a1 1 0 
+                                         01.836.986V17a1 1 0 01-1 1h-2C7.82 
+                                         18 2 12.18 2 5V3z"/>
+                            </svg>
+                            Kontak Penjual
+                        </div>
+                        <p class="text-xs text-gray-700 dark:text-gray-300">${transaction.seller}</p>
+                        <p class="text-xs text-blue-600 dark:text-blue-400">${transaction.sellerPhone}</p>
+                    </div>
+                    
+                    <!-- Tombol -->
+                    <div class="flex space-x-2 pt-2">
+                        <button onclick="this.closest('.fixed').remove()" 
+                                class="flex-1 bg-gray-200 dark:bg-gray-600 text-gray-900 dark:text-gray-200 py-2 rounded-lg text-sm hover:bg-gray-300 dark:hover:bg-gray-500">
+                            Tutup
+                        </button>
+                        <button onclick="showOrderTracking('${transaction.id}'); this.closest('.fixed').remove();" 
+                                class="flex-1 bg-green-500 text-white py-2 rounded-lg text-sm hover:bg-green-600">
+                            Lacak
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Loading Bar at Bottom -->
+                <div class="h-1 bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-green-400 to-green-600 animate-loading-bar"></div>
+                </div>
+            </div>
+        `;
+    
+    document.body.appendChild(modal);
+    
+    // auto close (optional)
+    setTimeout(() => modal.remove(), 15000);
+    
+  }, 1500); // Loading selama 1.5 detik
+}
+
+function showOrderTracking(orderId) {
+  console.log('Tracking order:', orderId);
+}
+
+// CSS Animations
+const style = document.createElement('style');
+style.innerHTML = `
+    @keyframes zoomIn {
+        from { 
+            transform: scale(0.8) translateY(20px); 
+            opacity: 0; 
+        }
+        to { 
+            transform: scale(1) translateY(0); 
+            opacity: 1; 
+        }
+    }
+    
+    @keyframes loadingBar {
+        0% { 
+            transform: translateX(-100%); 
+        }
+        50% { 
+            transform: translateX(0%); 
+        }
+        100% { 
+            transform: translateX(100%); 
+        }
+    }
+    
+    .animate-zoomIn { 
+        animation: zoomIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+    }
+    
+    .animate-loading-bar { 
+        animation: loadingBar 2s ease-in-out infinite; 
+    }
+`;
+document.head.appendChild(style);
+
+// ==================== RENDER KATEGORI ====================
+categories.forEach(cat => {
+  const div = document.createElement("div");
+  div.className = "flex flex-col items-center min-w-[90px]";
+  div.innerHTML = `
+    <img src="${categoryImages[cat] || 'https://via.placeholder.com/80'}" class="w-20 h-20 rounded-full object-cover mb-1 hover:scale-110 transition" />
+    <button class="category-btn text-sm">${cat}</button>
+  `;
+  categoryBar.appendChild(div);
+  div.querySelector("button").addEventListener("click", () => {
+    document.querySelectorAll(".category-btn").forEach(b => b.classList.remove("active"));
+    div.querySelector("button").classList.add("active");
+    renderMenu(cat==="Semua"?menus:menus.filter(m=>m.category===cat));
+  });
+});
+
+// ==================== RENDER MENU ====================
+function renderMenu(list){
+  menuList.innerHTML = "";
+  if(!list.length){ 
+    menuList.innerHTML = '<p class="text-center text-gray-600">Menu tidak ditemukan.</p>'; 
+    return; 
+  }
+
+  list.forEach(m => {
+    const card = document.createElement("div");
+    card.className = "bg-white rounded-lg shadow flex flex-col hover:shadow-md transition";
+    card.innerHTML = `
+      <div class="relative">
+        <img src="${m.img}" class="w-full h-36 object-cover rounded-t-lg" />
+        ${
+          m.discount > 0
+          ? `<span class="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-0.5 rounded animate-pulse">-${m.discount}%</span>`
+          : ""
+        }
+      </div>
+      <div class="p-2 flex flex-col flex-1">
+        <div class="flex justify-between text-xs text-gray-600 mb-1">
+          <span>${m.time}</span><span>⭐ ${m.rating}</span>
+        </div>
+        <p class="font-semibold text-sm text-gray-900">${m.name}</p>
+        <p class="text-gray-600 text-xs">${m.desc}</p>
+        <div class="mt-3 flex justify-between items-center">
+          <div>
+            <span class="text-red-600 font-bold">
+              ${m.discount>0?`Rp${(m.price*(1-m.discount/100)).toLocaleString()}`:`Rp${m.price.toLocaleString()}`}
+            </span>
+            ${m.discount>0?`<span class="line-through text-xs text-gray-500 ml-1">Rp${m.price.toLocaleString()}</span>`:""}
+          </div>
+          <div class="flex items-center space-x-2">
+            <button class="minus-btn bg-gray-200 px-3 rounded">-</button>
+            <button class="plus-btn bg-red-600 text-white px-3 rounded">+</button>
+          </div>
+        </div>
+      </div>`;
+    
+    card.querySelector(".plus-btn").addEventListener("click",()=>addToCart(m));
+    card.querySelector(".minus-btn").addEventListener("click",()=>removeFromCart(m));
+    menuList.appendChild(card);
+  });
+}
+
+// ==================== CART ====================
+function addToCart(menu){
+  const index=cart.findIndex(i=>i.name===menu.name);
+  const price=menu.discount>0?menu.price*(1-menu.discount/100):menu.price;
+  if(index>-1){ cart[index].qty+=1; } else { cart.push({...menu, price, qty:1}); }
+  renderCart();
+}
+function removeFromCart(menu){
+  const index=cart.findIndex(i=>i.name===menu.name);
+  if(index>-1){ cart[index].qty-=1; if(cart[index].qty<=0) cart.splice(index,1); renderCart(); }
+}
+function renderCart(){
+  cartList.innerHTML=""; let total=0;
+  cart.forEach(i=>{ total+=i.price*i.qty; const li=document.createElement("li"); li.textContent=`${i.name} x${i.qty} - Rp${i.price.toLocaleString()}`; cartList.appendChild(li); });
+  cartTotalEl.textContent="Rp"+total.toLocaleString();
+  cartLayout.classList.toggle("hidden",cart.length===0);
+}
+
+// ==================== BAYAR & RIWAYAT ====================
+document.getElementById("pay-btn").addEventListener("click",()=>{
+  if(cart.length===0) return;
+  const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const txHistory=gofoodStorage.get(TX2_KEY,[]);
+  const newTx={id:Date.now().toString(36)+Math.random().toString(36).substr(2,5),menus:[...cart],total,status:"Pesanan dibuat",ts:Date.now(),seller:"Warung Makan Enak",sellerPhone:"08123456789",deliveryRouteImg:"https://source.unsplash.com/600x150/?map"};
+  txHistory.unshift(newTx); gofoodStorage.set(TX2_KEY,txHistory);
+  showPaymentSuccessPopup(newTx);
+  cart=[]; renderCart();
+});
+
+// ==================== RIWAYAT ====================
+aktivitasBtn.addEventListener("click", () => {
+  renderTx();
+  aktivitasLayout.classList.remove("hidden");
+});
+aktivitasClose.addEventListener("click", () => {
+  aktivitasLayout.classList.add("hidden");
+});
+
+function renderTx(){
+  const tx = gofoodStorage.get(TX2_KEY, []);
+  txList.innerHTML = "";
+
+  if(tx.length === 0){
+    txList.innerHTML = `
+      <div class="text-center py-8">
+        <div class="text-gray-400 text-6xl mb-4">ðŸ“‹</div>
+        <p class="text-gray-600 text-lg">Belum ada transaksi</p>
+        <p class="text-gray-500 text-sm">Pesanan Anda akan muncul di sini</p>
+      </div>
+    `;
+    return;
+  }
+
+  tx.forEach(t => {
+    const div = document.createElement("div");
+    div.className = "bg-white rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer border border-gray-100";
+    
+    div.innerHTML = `
+      <div class="p-4">
+        <!-- Header Card -->
+        <div class="flex justify-between items-start mb-3">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center">
+              <span class="text-white font-bold text-sm">#${t.id.substring(0,3).toUpperCase()}</span>
+            </div>
+            <div>
+              <p class="font-bold text-red-600 text-lg">Rp ${t.total.toLocaleString()}</p>
+              <p class="text-xs text-gray-600">${new Date(t.ts).toLocaleDateString('id-ID', { 
+                weekday: 'short', 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              })}</p>
+            </div>
+          </div>
+          <div class="flex flex-col items-end">
+            <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium mb-1">${t.status}</span>
+            <span class="text-xs text-gray-500">${t.menus.length} item</span>
+          </div>
+        </div>
+        
+        <!-- Menu Items Preview -->
+        <div class="bg-gray-50 rounded-lg p-3 mb-3">
+          <div class="flex items-center space-x-2 overflow-x-auto">
+            ${t.menus.slice(0, 3).map(m => `
+              <img src="${m.img}" class="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
+            `).join('')}
+            ${t.menus.length > 3 ? `<div class="w-12 h-12 rounded-lg bg-gray-200 flex items-center justify-center flex-shrink-0"><span class="text-xs text-gray-600">+${t.menus.length - 3}</span></div>` : ''}
+          </div>
+          <p class="text-sm text-gray-700 mt-2 line-clamp-2">${t.menus.map(m => `${m.name} x${m.qty}`).join(", ")}</p>
+        </div>
+        
+        <!-- Footer -->
+        <div class="flex justify-between items-center">
+          <div class="flex items-center space-x-2 text-xs text-gray-600">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
+            </svg>
+            <span>${t.seller}</span>
+          </div>
+          <div class="text-red-600 text-sm font-medium">Lihat Detail â†’</div>
+        </div>
+      </div>
+    `;
+
+    div.addEventListener("click", () => openTxDetail(t));
+    txList.appendChild(div);
+  });
+}
+
+// ==================== OPEN DETAIL TRANSAKSI DENGAN RUTE ====================
+function openTxDetail(t){
+  txDetailList.innerHTML = "";
+  txDetailLayout.classList.remove("hidden");
+
+  // Show loading skeleton first
+  showLoadingSkeleton();
+
+  // Simulate loading delay for better UX
+  setTimeout(() => {
+    txDetailList.innerHTML = "";
+    
+    // Add entrance animation
+    txDetailList.style.opacity = "0";
+    txDetailList.style.transform = "translateY(20px)";
+    
+    // Header Info with proper alignment
+    const headerInfo = document.createElement("div");
+    headerInfo.className = "bg-green-600 text-white rounded-lg p-6 mb-6 shadow-md";
+    headerInfo.innerHTML = `
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <div class="flex items-center space-x-3 mb-2">
+            <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M7 4V2C7 1.45 7.45 1 8 1H16C16.55 1 17 1.45 17 2V4H20C20.55 4 21 4.45 21 5S20.55 6 20 6H19V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V6H4C3.45 6 3 5.55 3 5S3.45 4 4 4H7ZM9 3V4H15V3H9ZM7 6V19H17V6H7Z"/>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold">Pesanan #${t.id.toUpperCase()}</h3>
+          </div>
+          <p class="text-white/90 text-sm ml-13">${new Date(t.ts).toLocaleDateString('id-ID', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          })}</p>
+        </div>
+        <div class="text-right">
+          <p class="text-sm text-white/80 mb-1">Total Saldo</p>
+          <p class="text-3xl font-bold mb-1">Rp ${t.total.toLocaleString()}</p>
+          <span class="px-3 py-1 bg-white/20 rounded-full text-sm font-medium">${t.status}</span>
+        </div>
+      </div>
+      
+      <!-- Step tracker instead of progress bar -->
+      <div class="bg-white/10 rounded-lg p-4">
+        <div class="flex items-center justify-between text-xs">
+          <div class="flex flex-col items-center">
+            <div class="w-6 h-6 bg-white rounded-full flex items-center justify-center mb-1">
+              <svg class="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+              </svg>
+            </div>
+            <span class="text-white/80">Dipesan</span>
+          </div>
+          <div class="flex-1 h-0.5 bg-white/30 mx-2"></div>
+          <div class="flex flex-col items-center">
+            <div class="w-6 h-6 bg-white rounded-full flex items-center justify-center mb-1">
+              <svg class="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+              </svg>
+            </div>
+            <span class="text-white/80">Dimasak</span>
+          </div>
+          <div class="flex-1 h-0.5 bg-white/30 mx-2"></div>
+          <div class="flex flex-col items-center">
+            <div class="w-6 h-6 bg-white/60 rounded-full flex items-center justify-center mb-1">
+              <div class="w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>
+            </div>
+            <span class="text-white/80">Diantar</span>
+          </div>
+          <div class="flex-1 h-0.5 bg-white/20 mx-2"></div>
+          <div class="flex flex-col items-center">
+            <div class="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center mb-1">
+              <div class="w-2 h-2 bg-white/40 rounded-full"></div>
+            </div>
+            <span class="text-white/60">Selesai</span>
+          </div>
+        </div>
+      </div>
+    `;
+    txDetailList.appendChild(headerInfo);
+
+    // Delivery tracking with motorcycle icon
+    const routeDiv = document.createElement("div");
+    routeDiv.className = "mb-6";
+    routeDiv.innerHTML = `
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+        <div class="p-4 border-b border-gray-100 dark:border-gray-700">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M5,11L6.5,6.5H17.5L19,11H17V12C17,12.55 16.55,13 16,13H15C14.45,13 14,12.55 14,12V11H10V12C10,12.55 9.55,13 9,13H8C7.45,13 7,12.55 7,12V11H5M6,13.5C6,14.33 6.67,15 7.5,15C8.33,15 9,14.33 9,13.5C9,12.67 8.33,12 7.5,12C6.67,12 6,12.67 6,13.5M15,13.5C15,14.33 15.67,15 16.5,15C17.33,15 18,14.33 18,13.5C18,12.67 17.33,12 16.5,12C15.67,12 15,12.67 15,13.5Z"/>
+                </svg>
+              </div>
+              <div>
+                <p class="font-semibold text-gray-900 dark:text-gray-100">Driver dalam perjalanan</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Est. 15-25 menit • 3.2 km</p>
+              </div>
+            </div>
+            <div class="flex items-center space-x-2">
+              <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+              <span class="text-sm font-medium text-green-600 dark:text-green-400">Live</span>
+            </div>
+          </div>
+        </div>
+        <div class="p-4">
+          <div class="flex items-center justify-between">
+            <p class="text-sm text-gray-600 dark:text-gray-400">Tracking aktif untuk pesanan ini</p>
+            <button class="text-green-600 dark:text-green-400 text-sm font-medium hover:text-green-700 dark:hover:text-green-300 transition">
+              Lihat Rute →
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    txDetailList.appendChild(routeDiv);
+
+    // Restaurant info with aligned text and smaller contact buttons
+    const sellerInfo = document.createElement("div");
+    sellerInfo.className = "bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 mb-6 border border-gray-100 dark:border-gray-700";
+    sellerInfo.innerHTML = `
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3 flex-1">
+          <div class="relative">
+            <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900 rounded-xl flex items-center justify-center">
+              <svg class="w-6 h-6 text-orange-600 dark:text-orange-400" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+              </svg>
+            </div>
+            <div class="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center border border-white dark:border-gray-800">
+              <svg class="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+              </svg>
+            </div>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center space-x-2 mb-1">
+              <p class="font-bold text-gray-900 dark:text-gray-100 text-base truncate">${t.seller}</p>
+              <span class="px-2 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded-md font-medium whitespace-nowrap">Verified</span>
+            </div>
+            <p class="text-gray-600 dark:text-gray-400 text-sm mb-1">Merchant Partner</p>
+            <div class="flex items-center space-x-3 text-sm">
+              <div class="flex items-center space-x-1">
+                <svg class="w-3 h-3 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                </svg>
+                <span class="text-gray-700 dark:text-gray-300">4.8</span>
+              </div>
+              <span class="text-gray-300 dark:text-gray-600">•</span>
+              <span class="text-gray-600 dark:text-gray-400">2.1k orders</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center space-x-2 ml-3">
+          <button class="bg-green-500 hover:bg-green-600 text-white p-2 rounded-lg transition shadow-sm" onclick="window.location.href='tel:${t.sellerPhone}'">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
+            </svg>
+          </button>
+          <button class="bg-green-500 hover:bg-green-600 text-white p-2 rounded-lg transition shadow-sm" onclick="window.open('https://wa.me/${t.sellerPhone?.replace(/[^0-9]/g, '')}')">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.89 3.097"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    `;
+    txDetailList.appendChild(sellerInfo);
+
+    // Menu container with visual separators
+    const menuContainer = document.createElement("div");
+    menuContainer.className = "bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 mb-6 border border-gray-100 dark:border-gray-700";
+    menuContainer.innerHTML = `
+      <div class="flex items-center justify-between mb-3 pb-3 border-b border-gray-100 dark:border-gray-700">
+        <h3 class="font-bold text-gray-900 dark:text-gray-100 text-base">Detail Pesanan</h3>
+        <span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md text-xs">${t.menus.length} Items</span>
+      </div>
+    `;
+    
+    t.menus.forEach((m, index) => {
+      const item = document.createElement("div");
+      item.className = "flex items-center space-x-3 py-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg mb-2 last:mb-0";
+      item.innerHTML = `
+        <div class="relative flex-shrink-0">
+          <img src="${m.img}" class="w-12 h-12 object-cover rounded-lg border border-gray-200 dark:border-gray-600">
+          ${m.discount > 0 ? `<div class="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1 py-0.5 rounded-full font-bold text-[10px]">${m.discount}%</div>` : ''}
+        </div>
+        <div class="flex-1 min-w-0 px-2">
+          <div class="flex items-start justify-between">
+            <div class="flex-1 min-w-0">
+              <p class="font-semibold text-gray-900 dark:text-gray-100 text-sm truncate">${m.name}</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">${m.time}</p>
+              <div class="flex items-center space-x-2">
+                <span class="px-2 py-0.5 bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded text-xs border">Qty: ${m.qty}</span>
+                ${index === 0 ? '<span class="px-2 py-0.5 bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 rounded text-xs border border-orange-200 dark:border-orange-700">Terpopuler</span>' : ''}
+              </div>
+            </div>
+            <div class="text-right ml-3">
+              <p class="font-bold text-sm text-gray-900 dark:text-gray-100">
+                ${m.discount > 0 ? 
+                  `Rp ${(m.price * (1 - m.discount / 100) * m.qty).toLocaleString()}` : 
+                  `Rp ${(m.price * m.qty).toLocaleString()}`
+                }
+              </p>
+              ${m.discount > 0 ? 
+                `<p class="text-xs text-gray-400 line-through">Rp ${(m.price * m.qty).toLocaleString()}</p>` : 
+                ''
+              }
+            </div>
+          </div>
+        </div>
+      `;
+      menuContainer.appendChild(item);
+    });
+    txDetailList.appendChild(menuContainer);
+
+    // Footer with better visual hierarchy
+    const footer = document.createElement("div");
+    footer.className = "bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5 border border-gray-100 dark:border-gray-700";
+    footer.innerHTML = `
+      <div class="space-y-3">
+        <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 space-y-2">
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600 dark:text-gray-400">Subtotal</span>
+            <span class="font-medium text-gray-900 dark:text-gray-100">Rp ${(t.total * 0.85).toLocaleString()}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600 dark:text-gray-400">Biaya Pengiriman</span>
+            <span class="font-medium text-gray-900 dark:text-gray-100">Rp ${(t.total * 0.1).toLocaleString()}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600 dark:text-gray-400">Biaya Platform</span>
+            <span class="font-medium text-gray-900 dark:text-gray-100">Rp ${(t.total * 0.05).toLocaleString()}</span>
+          </div>
+        </div>
+        <div class="border-t dark:border-gray-700 pt-3">
+          <div class="flex justify-between">
+            <span class="font-bold text-lg text-gray-900 dark:text-gray-100">Total Saldo</span>
+            <span class="font-bold text-xl text-green-600 dark:text-green-400">Rp ${t.total.toLocaleString()}</span>
+          </div>
+        </div>
+        <div class="flex space-x-3 pt-2">
+          <button class="flex-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-3 px-4 rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition cancel-btn">
+            <svg class="w-4 h-4 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+            </svg>
+            Batalkan
+          </button>
+          <button class="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg font-medium transition shadow-sm" onclick="showOrderTracking('${t.id}')">
+            <svg class="w-4 h-4 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+            </svg>
+            Lacak Pesanan
+          </button>
+        </div>
+      </div>
+    `;
+    
+    footer.querySelector(".cancel-btn").addEventListener("click", () => {
+      const allTx = gofoodStorage.get(TX2_KEY, []);
+      gofoodStorage.set(TX2_KEY, allTx.filter(x => x.id !== t.id));
+      txDetailLayout.classList.add("hidden");
+      renderTx();
+    });
+    
+    txDetailList.appendChild(footer);
+
+    // Animate content in
+    setTimeout(() => {
+      txDetailList.style.transition = "all 0.5s ease-out";
+      txDetailList.style.opacity = "1";
+      txDetailList.style.transform = "translateY(0)";
+    }, 100);
+    
+  }, 800); // Loading delay
+}
+
+// Loading skeleton function
+function showLoadingSkeleton() {
+  txDetailList.innerHTML = `
+    <div class="animate-pulse space-y-6">
+      <!-- Header skeleton -->
+      <div class="bg-gray-200 dark:bg-gray-700 rounded-lg p-6 relative overflow-hidden">
+        <div class="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/60 to-transparent dark:via-white/10"></div>
+        <div class="flex justify-between items-center mb-4">
+          <div>
+            <div class="h-6 bg-gray-300 dark:bg-gray-600 rounded w-40 mb-2"></div>
+            <div class="h-4 bg-gray-300 dark:bg-gray-600 rounded w-48"></div>
+          </div>
+          <div class="text-right">
+            <div class="h-4 bg-gray-300 dark:bg-gray-600 rounded w-16 mb-1"></div>
+            <div class="h-8 bg-gray-300 dark:bg-gray-600 rounded w-24 mb-1"></div>
+            <div class="h-6 bg-gray-300 dark:bg-gray-600 rounded w-16"></div>
+          </div>
+        </div>
+        <div class="h-16 bg-gray-300 dark:bg-gray-600 rounded-lg"></div>
+      </div>
+      
+      <!-- Route skeleton -->
+      <div class="bg-gray-200 dark:bg-gray-700 rounded-xl overflow-hidden relative">
+        <div class="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/60 to-transparent dark:via-white/10"></div>
+        <div class="p-4">
+          <div class="flex items-center space-x-3 mb-3">
+            <div class="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-lg"></div>
+            <div>
+              <div class="h-4 bg-gray-300 dark:bg-gray-600 rounded w-32 mb-1"></div>
+              <div class="h-3 bg-gray-300 dark:bg-gray-600 rounded w-24"></div>
+            </div>
+          </div>
+          <div class="h-4 bg-gray-300 dark:bg-gray-600 rounded w-32"></div>
+        </div>
+      </div>
+      
+      <!-- Seller skeleton -->
+      <div class="bg-gray-200 dark:bg-gray-700 rounded-xl p-4 relative overflow-hidden">
+        <div class="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/60 to-transparent dark:via-white/10"></div>
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3 flex-1">
+            <div class="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-xl"></div>
+            <div class="flex-1">
+              <div class="h-4 bg-gray-300 dark:bg-gray-600 rounded w-32 mb-2"></div>
+              <div class="h-3 bg-gray-300 dark:bg-gray-600 rounded w-24 mb-1"></div>
+              <div class="h-3 bg-gray-300 dark:bg-gray-600 rounded w-20"></div>
+            </div>
+          </div>
+          <div class="flex space-x-2">
+            <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-lg"></div>
+            <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-lg"></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Menu items skeleton -->
+      <div class="bg-gray-200 dark:bg-gray-700 rounded-xl p-4 relative overflow-hidden">
+        <div class="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/60 to-transparent dark:via-white/10"></div>
+        <div class="h-5 bg-gray-300 dark:bg-gray-600 rounded w-32 mb-4"></div>
+        <div class="space-y-3">
+          ${[1,2,3].map(() => `
+            <div class="bg-gray-300 dark:bg-gray-600 rounded-lg p-3">
+              <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 bg-gray-400 dark:bg-gray-500 rounded-lg"></div>
+                <div class="flex-1">
+                  <div class="h-4 bg-gray-400 dark:bg-gray-500 rounded w-32 mb-2"></div>
+                  <div class="h-3 bg-gray-400 dark:bg-gray-500 rounded w-24 mb-1"></div>
+                  <div class="h-3 bg-gray-400 dark:bg-gray-500 rounded w-16"></div>
+                </div>
+                <div class="h-4 bg-gray-400 dark:bg-gray-500 rounded w-16"></div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      
+      <!-- Footer skeleton -->
+      <div class="bg-gray-200 dark:bg-gray-700 rounded-xl p-5 relative overflow-hidden">
+        <div class="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/60 to-transparent dark:via-white/10"></div>
+        <div class="bg-gray-300 dark:bg-gray-600 rounded-lg p-3 mb-3">
+          <div class="space-y-2">
+            ${[1,2,3].map(() => `
+              <div class="flex justify-between">
+                <div class="h-3 bg-gray-400 dark:bg-gray-500 rounded w-20"></div>
+                <div class="h-3 bg-gray-400 dark:bg-gray-500 rounded w-16"></div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        <div class="flex space-x-3">
+          <div class="flex-1 h-12 bg-gray-300 dark:bg-gray-600 rounded-lg"></div>
+          <div class="flex-1 h-12 bg-gray-300 dark:bg-gray-600 rounded-lg"></div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// Tombol tutup overlay detail
+txDetailClose.addEventListener("click", () => {
+  txDetailLayout.classList.add("hidden");
+});
+
+// ==================== SEARCH DENGAN EFEK ====================
+searchInput?.addEventListener("input", e => {
+  const keyword = e.target.value.toLowerCase();
+  searchWrapper.classList.add('search-focused');
+  
+  if (keyword.length === 0) {
+    // Jika kosong, kembali normal
+    searchWrapper.classList.remove('search-focused', 'search-no-results');
+    renderMenu(menus);
+    return;
+  }
+  
+  const filteredMenus = menus.filter(m => m.name.toLowerCase().includes(keyword));
+  
+  if (filteredMenus.length === 0) {
+    // Jika tidak ada hasil
+    searchWrapper.classList.remove('search-focused');
+    searchWrapper.classList.add('search-no-results');
+  } else {
+    // Jika ada hasil
+    searchWrapper.classList.remove('search-no-results');
+    searchWrapper.classList.add('search-focused');
+  }
+  
+  renderMenu(filteredMenus);
+});
+
+searchInput?.addEventListener("blur", () => {
+  setTimeout(() => {
+    if (searchInput.value.length === 0) {
+      searchWrapper.classList.remove('search-focused', 'search-no-results');
+    }
+  }, 200);
+});
+
+// ==================== OPEN LAYOUT ====================
+gfBtn.addEventListener("click",()=>{ gfLoading.classList.remove("hidden"); setTimeout(()=>{gfLoading.classList.add("hidden"); gfLayout.classList.remove("hidden"); renderMenu(menus); startCarousel();},1000); });
+gfClose.addEventListener("click",()=>gfLayout.classList.add("hidden"));
+
+
+// ==================== PROMO FILTER ====================
+document.getElementById("promo-btn").addEventListener("click", () => {
+  document.querySelectorAll(".category-btn").forEach(b => b.classList.remove("active"));
+  renderMenu(menus.filter(m => m.discount > 0));
+});
+
+// Dark mode support
+if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.documentElement.classList.add('dark');
+}
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+    if (event.matches) {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
+});
+
+// Simple Professional App Controller
+let isStickySaldoVisible = false;
+let saldoIsHidden = false;
+let isRefreshing = false;
+
+// Sticky saldo effect saat scroll
+window.addEventListener('scroll', function() {
+  const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+  const stickySaldo = document.getElementById('stickySaldo');
+  const threshold = 200;
+  
+  if (scrollTop > threshold && !isStickySaldoVisible) {
+    stickySaldo.classList.add('show');
+    isStickySaldoVisible = true;
+    syncSaldoValues();
+  } else if (scrollTop <= threshold && isStickySaldoVisible) {
+    stickySaldo.classList.remove('show');
+    isStickySaldoVisible = false;
+  }
+}, { passive: true });
+
+// Sync nilai saldo antara card utama dan sticky
+function syncSaldoValues() {
+  const balance = document.getElementById('balance');
+  const stickyBalance = document.getElementById('stickyBalance');
+  const poin = document.getElementById('poin');
+  const stickyPoin = document.getElementById('stickyPoin');
+  
+  stickyBalance.textContent = balance.textContent;
+  stickyPoin.textContent = poin.textContent;
+}
+
+// Toggle saldo visibility
+function toggleSaldoVisibility(isMainCard = true) {
+  const balance = document.getElementById(isMainCard ? 'balance' : 'stickyBalance');
+  const stickyBalance = document.getElementById(isMainCard ? 'stickyBalance' : 'balance');
+  const eyeIcon = document.getElementById(isMainCard ? 'eyeIcon' : 'stickyEyeIcon');
+  const stickyEyeIcon = document.getElementById(isMainCard ? 'stickyEyeIcon' : 'eyeIcon');
+  
+  if (balance.textContent.includes('.') || balance.textContent === '1.487.500') {
+    // Hide saldo
+    balance.textContent = '••••••••';
+    stickyBalance.textContent = '••••••••';
+    saldoIsHidden = true;
+    
+    const hiddenIcon = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L7.05 7.05M9.878 9.878a3 3 0 105.303 5.303m0 0l2.828 2.829M15.182 15.182L17.01 17.01" />`;
+    
+    eyeIcon.innerHTML = hiddenIcon;
+    stickyEyeIcon.innerHTML = hiddenIcon;
+  } else {
+    // Show saldo
+    balance.textContent = '1.487.500';
+    stickyBalance.textContent = '1.487.500';
+    saldoIsHidden = false;
+    
+    const visibleIcon = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 
+                         8.268 2.943 9.542 7-1.274 
+                         4.057-5.064 7-9.542 7-4.477 
+                         0-8.268-2.943-9.542-7z" />`;
+    
+    eyeIcon.innerHTML = visibleIcon;
+    stickyEyeIcon.innerHTML = visibleIcon;
+  }
+}
+
+(function() {
+  const paySection = document.getElementById("paySection");
+  const payCard = document.getElementById("payCard");
+  const payBackdrop = document.getElementById("payBackdrop");
+  const closePay = document.getElementById("closePay");
+  const tabPay = document.getElementById("tabPay");
+  const bottomNav = document.querySelector(".bottom-nav");
+
+  const tabSlider = document.getElementById("tabSlider");
+  const tabBtns = document.querySelectorAll(".tabBtn");
+  
+  let activeTab = 0;
+  let startX = 0, currentX = 0, isDragging = false;
+
+  // ==== OPEN & CLOSE SHEET ====
+  function openPay() {
+    bottomNav.classList.add("hidden");
+    paySection.classList.remove("hidden");
+    requestAnimationFrame(() => payCard.classList.remove("translate-y-full"));
+  }
+  function closePaySheet() {
+    payCard.classList.add("translate-y-full");
+    setTimeout(() => {
+      paySection.classList.add("hidden");
+      bottomNav.classList.remove("hidden");
+    }, 300);
+  }
+
+  tabPay.addEventListener("click", openPay);
+  closePay.addEventListener("click", closePaySheet);
+  payBackdrop.addEventListener("click", closePaySheet);
+
+  // ==== TAB SWITCH ====
+  function setActiveTab(index) {
+    activeTab = index;
+    tabSlider.style.transform = `translateX(-${index * 100}%)`;
+    tabBtns.forEach((btn, i) => {
+      if (i === index) {
+        btn.classList.add("text-blue-600","font-semibold","border-b-2","border-blue-600");
+        btn.classList.remove("text-gray-500");
+      } else {
+        btn.classList.remove("text-blue-600","font-semibold","border-b-2","border-blue-600");
+        btn.classList.add("text-gray-500");
+      }
+    });
+  }
+  tabBtns.forEach((btn, i) => {
+    btn.addEventListener("click", () => setActiveTab(i));
+  });
+
+})();
+
+//garis ombak menu
+document.addEventListener("DOMContentLoaded", () => {
+  const homeSection = document.getElementById("homeSection");
+  if (!homeSection) return;
+  
+  // Container utama ombak
+  const waveContainer = document.createElement("div");
+  Object.assign(waveContainer.style, {
+    position: "relative",
+    overflow: "hidden",
+    borderRadius: "18px",
+    background: "white",
+    boxShadow: "0 6px 16px rgba(0,0,0,0.08)",
+    marginBottom: "20px",
+  });
+  
+  // SVG Ombak dinamis realistis
+  const wave = document.createElement("div");
+  wave.innerHTML = `
+    <svg viewBox="0 0 500 80" preserveAspectRatio="none"
+      style="position:absolute;top:0;left:0;width:100%;height:55px;">
+      <defs>
+        <linearGradient id="gradBlue1" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#2563eb"/>
+          <stop offset="100%" stop-color="#3b82f6"/>
+        </linearGradient>
+        <linearGradient id="gradBlue2" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#1e40af"/>
+          <stop offset="100%" stop-color="#2563eb"/>
+        </linearGradient>
+
+        <style>
+          @keyframes waveBack {
+            0%   { d: path("M0,35 C150,75 350,15 500,45 L500,00 L0,0 Z"); }
+            25%  { d: path("M0,30 C150,65 350,25 500,40 L500,00 L0,0 Z"); }
+            50%  { d: path("M0,33 C150,78 350,18 500,43 L500,00 L0,0 Z"); }
+            75%  { d: path("M0,28 C150,70 350,25 500,38 L500,00 L0,0 Z"); }
+            100% { d: path("M0,35 C150,75 350,15 500,45 L500,00 L0,0 Z"); }
+          }
+
+          @keyframes waveFront {
+            0%   { d: path("M0,38 C150,68 350,25 500,48 L500,00 L0,0 Z"); }
+            25%  { d: path("M0,33 C150,60 350,30 500,42 L500,00 L0,0 Z"); }
+            50%  { d: path("M0,36 C150,70 350,22 500,46 L500,00 L0,0 Z"); }
+            75%  { d: path("M0,31 C150,63 350,28 500,40 L500,00 L0,0 Z"); }
+            100% { d: path("M0,38 C150,68 350,25 500,48 L500,00 L0,0 Z"); }
+          }
+
+          /* Gelombang belakang: lambat, tenang */
+          .wave1 {
+            animation: waveBack 10s cubic-bezier(0.42, 0, 0.58, 1) infinite;
+            opacity: 0.6;
+          }
+
+          /* Gelombang depan: lebih cepat, bervariasi */
+          .wave2 {
+            animation: waveFront 6s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+            animation-delay: -2s;
+            opacity: 1;
+          }
+
+          /* Efek variasi kecepatan alami (accelerate + decelerate) */
+          @keyframes speedShift {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(-10px); }
+          }
+
+          .wave1, .wave2 {
+            transform-origin: center;
+            animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+          }
+        </style>
+      </defs>
+
+      <path class="wave1" d="M0,35 C150,75 350,15 500,45 L500,00 L0,0 Z"
+        style="stroke:none;fill:url(#gradBlue2);"></path>
+
+      <path class="wave2" d="M0,38 C150,68 350,25 500,48 L500,00 L0,0 Z"
+        style="stroke:none;fill:url(#gradBlue1);"></path>
+    </svg>
+  `;
+  
+  // Bungkus isi lama tanpa hapus event/icon
+  const contentWrapper = document.createElement("div");
+  contentWrapper.style.paddingTop = "45px";
+  while (homeSection.firstChild) {
+    contentWrapper.appendChild(homeSection.firstChild);
+  }
+  
+  waveContainer.appendChild(wave);
+  waveContainer.appendChild(contentWrapper);
+  homeSection.appendChild(waveContainer);
+  
+  // Background lembut
+  Object.assign(homeSection.style, {
+    background: "#f8fafc",
+    padding: "20px",
+  });
+});
+
+// Dark mode support
+if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  document.documentElement.classList.add('dark');
+}
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+  if (event.matches) {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
+});
+
+// Enhanced Menu functionality
+const menuToggleBtn = document.getElementById('menuToggleBtn');
+const closeMenuBtn = document.getElementById('closeMenuBtn');
+const slideMenu = document.getElementById('slideMenu');
+const menuOverlay = document.getElementById('menuOverlay');
+const notificationToast = document.getElementById('notificationToast');
+
+function showNotification() {
+  notificationToast.classList.add('show');
+  setTimeout(() => {
+    notificationToast.classList.remove('show');
+  }, 3000);
+}
+
+function openMenu() {
+  slideMenu.classList.add('open');
+  menuOverlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  showNotification();
+}
+
+function closeMenu() {
+  slideMenu.classList.remove('open');
+  menuOverlay.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+menuToggleBtn.addEventListener('click', openMenu);
+closeMenuBtn.addEventListener('click', closeMenu);
+menuOverlay.addEventListener('click', closeMenu);
+
+// Close menu when pressing Escape key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeMenu();
+  }
+});
+
+// Enhanced Refresh functionality
+const refreshSaldoBtn = document.getElementById('refreshSaldoBtn');
+const refreshIcon = document.getElementById('refreshIcon');
+const loadingSpinner = document.getElementById('loadingSpinner');
+const refreshText = document.getElementById('refreshText');
+
+refreshSaldoBtn.addEventListener('click', function() {
+  // Start loading state
+  refreshIcon.style.opacity = '0';
+  loadingSpinner.style.opacity = '1';
+  refreshText.textContent = 'Loading...';
+  
+  // Disable button during loading
+  refreshSaldoBtn.disabled = true;
+  
+  // Simulate loading
+  setTimeout(() => {
+    // End loading state
+    refreshIcon.style.opacity = '1';
+    loadingSpinner.style.opacity = '0';
+    refreshText.textContent = 'Refresh';
+    refreshSaldoBtn.disabled = false;
+    
+    // Enhanced spin animation
+    refreshIcon.style.transform = 'rotate(720deg)';
+    setTimeout(() => {
+      refreshIcon.style.transform = 'rotate(0deg)';
+    }, 800);
+  }, 2000);
+});
+
+// Enhanced Menu item click handlers
+document.querySelectorAll('.menu-item').forEach(item => {
+  item.addEventListener('click', function(event) {
+    const title = this.querySelector('h4').textContent;
+    console.log(`Menu clicked: ${title}`);
+    
+    // Add ripple effect
+    const ripple = document.createElement('div');
+    ripple.style.cssText = `
+                    position: absolute;
+                    border-radius: 50%;
+                    background: rgba(93, 92, 222, 0.3);
+                    transform: scale(0);
+                    animation: ripple 0.6s linear;
+                    width: 100px;
+                    height: 100px;
+                    left: ${event.offsetX - 50}px;
+                    top: ${event.offsetY - 50}px;
+                `;
+    
+    this.style.position = 'relative';
+    this.appendChild(ripple);
+    
+    setTimeout(() => {
+      ripple.remove();
+    }, 600);
+    
+    // Close menu after selection
+    setTimeout(() => {
+      closeMenu();
+    }, 300);
+  });
+});
+
+// Add ripple animation CSS
+const rippleStyle = document.createElement('style');
+rippleStyle.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+document.head.appendChild(rippleStyle);
